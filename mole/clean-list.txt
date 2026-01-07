@@ -1,0 +1,65 @@
+# Mole Cleanup Preview - 2026-01-06 11:30:55
+#
+# How to protect files:
+# 1. Copy any path below to ~/.config/mole/whitelist
+# 2. Run: mo clean --whitelist
+#
+# Example:
+#   /Users/*/Library/Caches/com.example.app
+#
+
+
+=== User essentials ===
+/Users/moskenstraumen/Library/Caches  # 3.20GB (25 items)
+/Users/moskenstraumen/Library/Logs  # 404KB (5 items)
+/Users/moskenstraumen/.Trash  # 704.4MB (21 items)
+
+=== Finder metadata ===
+
+=== macOS system caches ===
+/Users/moskenstraumen/Library/Suggestions  # 2.8MB (16 items)
+
+=== Sandboxed app caches ===
+
+=== Browsers ===
+/Users/moskenstraumen/Library/Caches/com.apple.Safari/WebKitCache  # 4KB
+/Users/moskenstraumen/Library/Caches/Google/Chrome  # 1.77GB (3 items)
+/Users/moskenstraumen/Library/Application Support/Google/Chrome/Default/GPUCache  # 545KB (5 items)
+/Users/moskenstraumen/Library/Application Support/Google/Chrome/Profile 1/GPUCache  # 5.6MB (7 items)
+
+=== Cloud storage ===
+
+=== Office applications ===
+
+=== Developer tools ===
+/Users/moskenstraumen/Library/pnpm/store/v10  # 159.1MB
+/Users/moskenstraumen/.bun/install/cache  # 14.6MB (27 items)
+/Users/moskenstraumen/.cache/uv  # 5KB (2 items)
+/Users/moskenstraumen/.oh-my-zsh/cache/grep-alias  # 1KB
+/Users/moskenstraumen/Library/Caches/SentryCrash/BetterDisplay  # 4KB
+/Users/moskenstraumen/Library/Caches/Homebrew  # 830.2MB (14 items)
+
+=== Development applications ===
+/Users/moskenstraumen/Library/Application Support/Code/logs/20260105T101018  # 2.1MB
+/Users/moskenstraumen/Library/Application Support/Code/Cache/Cache_Data  # 29.6MB
+/Users/moskenstraumen/Library/Application Support/Code/CachedData/e54c774e0add60467559eb0d1e229c6452cf8447  # 10.2MB
+/Users/moskenstraumen  # 164KB (2 items)
+
+=== Virtual machine tools ===
+
+=== Application Support ===
+
+=== Uninstalled app data ===
+
+=== Apple Silicon updates ===
+
+=== iOS device backups ===
+
+=== Time Machine incomplete backups ===
+
+# ============================================
+# Summary
+# ============================================
+# Potential cleanup: 6.81GB
+# Items: 1706
+# Categories: 27

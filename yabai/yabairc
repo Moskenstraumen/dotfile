@@ -1,0 +1,89 @@
+#!/usr/bin/env sh
+
+sudo yabai --load-sa
+yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
+
+# Uncomment to refresh ubersicht widget on workspace change
+# Make sure to replace WIDGET NAME for the name of the ubersicht widget
+# ubersicht_spaces_refresh_command="osascript -e 'tell application id \"tracesOf.Uebersicht\" to refresh widget id \"WIDGET NAME\"'"
+
+###########################################
+
+# General
+yabai -m config layout                       bsp
+yabai -m config split_ratio                  0.50
+yabai -m config auto_balance                 off
+
+# Window
+yabai -m config window_placement             second_child
+# yabai -m config window_topmost             off
+# yabai -m config window_shadow              off
+yabai -m config window_opacity               off
+yabai -m config window_opacity_duration      0.0
+yabai -m config active_window_opacity        1.0
+yabai -m config normal_window_opacity        0.9
+
+# Window border
+yabai -m config external_bar                 all:32:0
+yabai -m config window_border 		           off
+yabai -m config window_border_width 	       4
+yabai -m config active_window_border_color   0xffffbb7d
+yabai -m config normal_window_border_color   0xff353c54
+
+# Mouse
+yabai -m config mouse_follows_focus          on
+yabai -m config focus_follows_mouse          autofocus
+yabai -m config mouse_modifier               shift cmd
+yabai -m config mouse_action1                move
+yabai -m config mouse_action2                resize
+
+# Paddings
+yabai -m config top_padding                  4
+yabai -m config bottom_padding               4
+yabai -m config left_padding                 4
+yabai -m config right_padding                4
+yabai -m config window_gap                   4
+
+###########################################
+
+# Run mobile script when display removed
+yabai -m signal --add event=display_removed action="~/.config/yabai/scripts/mobile.sh"
+# Run desk script when display added
+yabai -m signal --add event=display_added action="~/.config/yabai/scripts/desk.sh"
+
+# SketchyBar event signals
+yabai -m signal --add event=window_focused action="sketchybar --trigger yabai_window_focus"
+yabai -m signal --add event=window_created action="sketchybar --trigger yabai_window_created"
+yabai -m signal --add event=window_destroyed action="sketchybar --trigger yabai_window_destroyed"
+yabai -m signal --add event=window_minimized action="sketchybar --trigger yabai_window_minimized"
+yabai -m signal --add event=window_deminimized action="sketchybar --trigger yabai_window_deminimized"
+
+###########################################
+
+# Float apps
+# System
+yabai -m rule --add app="^(Calculator|Software Update|Dictionary|System Preferences|System Settings|Photo Booth|Archive Utility|Python|LibreOffice|App Store|Activity Monitor)$" manage=off
+yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
+yabai -m rule --add label="Select file to save to" app="^Inkscape$" title="Select file to save to" manage=off
+yabai -m rule --add app="^Finder$" manage=off
+yabai -m rule --add app="^Terminal$" manage=off
+yabai -m rule --add app="^Notes$" manage=off
+# User
+yabai -m rule --add app="^aTrust$" manage=off
+yabai -m rule --add app="^Clash Verge$" manage=off
+yabai -m rule --add app="^WeChat$" manage=off
+yabai -m rule --add app="^Spotify$" manage=off
+yabai -m rule --add app="^Logi Options+$" manage=off
+
+# Initial setup based on current display count
+display_count=$(yabai -m query --displays | jq 'length')
+if [ "$display_count" -gt 1 ]; then
+  ~/.config/yabai/scripts/desk.sh
+else
+  ~/.config/yabai/scripts/mobile.sh
+fi
+
+yabai -m rule --apply
+
+set +x
+echo "yabai configuration loaded.."

@@ -1,0 +1,117 @@
+# Rules
+# hyper - sth = Focus
+# alt - sth = Toggle
+# shift + alt - sth = Move
+# lctrl + alt - sth = Resize
+
+###########################################
+
+# Navigation
+# Move focus between windows on the current screen
+hyper - j       : yabai -m window --focus west
+hyper - k       : yabai -m window --focus south
+hyper - i       : yabai -m window --focus north
+hyper - l       : yabai -m window --focus east
+
+# Moving windows
+# Move the window itself (Swap position)
+shift + alt - j : yabai -m window --swap west
+shift + alt - k : yabai -m window --swap south
+shift + alt - i : yabai -m window --swap north
+shift + alt - l : yabai -m window --swap east
+
+###########################################
+
+# Resize windows
+lctrl + alt - j : yabai -m window --resize left:-50:0; \
+                  yabai -m window --resize right:-50:0
+lctrl + alt - k : yabai -m window --resize bottom:0:50; \
+                  yabai -m window --resize top:0:50
+lctrl + alt - i : yabai -m window --resize top:0:-50; \
+                  yabai -m window --resize bottom:0:-50
+lctrl + alt - l : yabai -m window --resize right:50:0; \
+                  yabai -m window --resize left:50:0
+
+# Equalize size of windows
+lctrl + alt - e : yabai -m space --balance
+
+# Enable / Disable gaps in current workspace
+lctrl + alt - g : yabai -m space --toggle padding; yabai -m space --toggle gap
+
+###########################################
+
+# change focus between external displays (left and right)
+hyper - s       : yabai -m display --focus west
+hyper - g       : yabai -m display --focus east
+
+# move window to display left and right
+shift + alt - s : yabai -m window --display west; yabai -m display --focus west;
+shift + alt - g : yabai -m window --display east; yabai -m display --focus east;
+
+###########################################
+
+# Rotate windows clockwise and anticlockwise
+alt - r         : yabai -m space --rotate 90
+
+# Toggle Float (For pop-ups or things you don't want tiled)
+alt - t         : yabai -m window --toggle float
+
+# Make window native fullscreen
+alt - f         : yabai -m window --toggle zoom-fullscreen
+
+###########################################
+
+# Focus space
+hyper - 1         : yabai -m space --focus 1
+hyper - 2         : yabai -m space --focus 2
+hyper - 3         : yabai -m space --focus 3
+hyper - 4         : yabai -m space --focus 4
+
+# Focus space (desktop only)
+hyper - d       : yabai -m space --focus main-dev
+hyper - w       : yabai -m space --focus main-work
+hyper - t       : yabai -m space --focus vert-term
+hyper - b       : yabai -m space --focus vert-web
+hyper - c       : yabai -m space --focus chat
+hyper - n       : yabai -m space --focus notes
+
+# Throw window to space
+shift + alt - 1 : yabai -m window --space 1
+shift + alt - 2 : yabai -m window --space 2
+shift + alt - 3 : yabai -m window --space 3
+shift + alt - 4 : yabai -m window --space 4
+shift + alt - 5 : yabai -m window --space 5
+
+# Create space and follow focus
+shift + alt - n : yabai -m space --create && \
+          index="$(yabai -m query --spaces --display | jq '.[length-1].index')" && \
+          yabai -m space --focus "${index}"
+
+# Destroy current space and focus previous space
+shift + alt - d : yabai -m space --focus prev && yabai -m space next --destroy
+
+# Cycle forwards on the focused display
+alt - tab       : ~/.config/yabai/scripts/cycle_next.sh
+
+# Cycle forwards on the focused display
+# alt - a : ~/.config/yabai/scripts/cycle_prev.sh
+
+###########################################
+
+# Open apps
+# Finder
+alt - e         : open ~/
+
+# Kitty
+alt - return    : "${HOME}"/.config/yabai/open_kitty.sh
+
+###########################################
+
+# Force run the scripts if automation fails
+ctrl + alt - m  : ~/.config/yabai/scripts/mobile.sh
+ctrl + alt - d  : ~/.config/yabai/scripts/desk.sh
+
+###########################################
+
+# Restart Yabai/Skhd (Use this after editing config)
+ctrl + alt - r  : yabai --restart-service; skhd --restart-service

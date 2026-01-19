@@ -67,7 +67,7 @@ yabai -m rule --add label="About This Mac" app="System Information" title="About
 yabai -m rule --add label="Select file to save to" app="^Inkscape$" title="Select file to save to" manage=off
 yabai -m rule --add app="^Finder$" manage=off
 yabai -m rule --add app="^Terminal$" manage=off
-yabai -m rule --add app="^Notes$" manage=off
+yabai -m rule --add app="^(Notes|Reminders)$" manage=off
 # User
 yabai -m rule --add app="^aTrust$" manage=off
 yabai -m rule --add app="^Clash Verge$" manage=off

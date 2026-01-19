@@ -32,3 +32,8 @@ GPATH
 .config/zsh/.zcompcache/
 .config/zsh/.zcompdump*
 .config/zsh/*.zwc*
+
+mole/
+karabiner/automatic_backups/*
+
+.claude/

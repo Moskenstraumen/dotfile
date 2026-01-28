@@ -7,10 +7,9 @@ return {
           input = {
             keys = {
               -- Custom movement keys (ijkl instead of hjkl)
-              -- j = left, i = up, k = down, l = right
               ["k"] = "list_down", -- k = down
               ["i"] = "list_up", -- i = up
-              ["j"] = false, -- disable j (left doesn't apply here)
+              ["j"] = false, -- disable j
               ["h"] = false, -- h is now insert mode
             },
           },
@@ -19,18 +18,33 @@ return {
               -- Custom movement keys (ijkl instead of hjkl)
               ["k"] = "list_down", -- k = down
               ["i"] = "list_up", -- i = up
-              ["j"] = false, -- disable j (left doesn't apply here)
+              ["j"] = false, -- disable j
               ["h"] = false, -- h is now insert mode
             },
           },
           preview = {
             keys = {
               -- Custom movement keys (ijkl instead of hjkl)
-              ["k"] = "list_down", -- k = down (scroll down in preview)
-              ["i"] = "list_up", -- i = up (scroll up in preview)
+              ["k"] = "list_down", -- k = down
+              ["i"] = "list_up", -- i = up
               ["j"] = false, -- disable j
               ["h"] = false, -- h is now insert mode
-              -- Note: preview scrolling uses list_down/list_up actions
+            },
+          },
+        },
+        -- Explorer-specific configuration
+        sources = {
+          explorer = {
+            win = {
+              list = {
+                keys = {
+                  -- Custom movement keys (ijkl) for explorer
+                  ["i"] = "list_up", -- i = up
+                  ["k"] = "list_down", -- k = down
+                  ["j"] = false, -- disable j
+                  ["h"] = false, -- h is insert mode
+                },
+              },
             },
           },
         },

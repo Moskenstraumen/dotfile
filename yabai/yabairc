@@ -10,39 +10,39 @@ yabai -m signal --add event=dock_did_restart action="sudo yabai --load-sa"
 ###########################################
 
 # General
-yabai -m config layout                       bsp
-yabai -m config split_ratio                  0.50
-yabai -m config auto_balance                 off
+yabai -m config layout bsp
+yabai -m config split_ratio 0.50
+yabai -m config auto_balance off
 
 # Window
-yabai -m config window_placement             second_child
+yabai -m config window_placement second_child
 # yabai -m config window_topmost             off
 # yabai -m config window_shadow              off
-yabai -m config window_opacity               off
-yabai -m config window_opacity_duration      0.0
-yabai -m config active_window_opacity        1.0
-yabai -m config normal_window_opacity        0.9
+yabai -m config window_opacity off
+yabai -m config window_opacity_duration 0.0
+yabai -m config active_window_opacity 1.0
+yabai -m config normal_window_opacity 0.9
 
 # Window border
-yabai -m config external_bar                 all:32:0
-yabai -m config window_border 		           off
-yabai -m config window_border_width 	       4
-yabai -m config active_window_border_color   0xffffbb7d
-yabai -m config normal_window_border_color   0xff353c54
+yabai -m config external_bar all:32:0
+yabai -m config window_border off
+yabai -m config window_border_width 4
+yabai -m config active_window_border_color 0xffffbb7d
+yabai -m config normal_window_border_color 0xff353c54
 
 # Mouse
-yabai -m config mouse_follows_focus          on
-yabai -m config focus_follows_mouse          autofocus
-yabai -m config mouse_modifier               shift cmd
-yabai -m config mouse_action1                move
-yabai -m config mouse_action2                resize
+yabai -m config mouse_follows_focus on
+yabai -m config focus_follows_mouse autofocus
+yabai -m config mouse_modifier shift cmd
+yabai -m config mouse_action1 move
+yabai -m config mouse_action2 resize
 
 # Paddings
-yabai -m config top_padding                  4
-yabai -m config bottom_padding               4
-yabai -m config left_padding                 4
-yabai -m config right_padding                4
-yabai -m config window_gap                   4
+yabai -m config top_padding 4
+yabai -m config bottom_padding 4
+yabai -m config left_padding 4
+yabai -m config right_padding 4
+yabai -m config window_gap 4
 
 ###########################################
 
@@ -73,7 +73,7 @@ yabai -m rule --add app="^aTrust$" manage=off
 yabai -m rule --add app="^Clash Verge$" manage=off
 yabai -m rule --add app="^WeChat$" manage=off
 yabai -m rule --add app="^Spotify$" manage=off
-yabai -m rule --add app="^Logi Options+$" manage=off
+yabai -m rule --add app="^Tailscale$" manage=off
 
 # Initial setup based on current display count
 display_count=$(yabai -m query --displays | jq 'length')

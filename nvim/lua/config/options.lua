@@ -9,11 +9,5 @@ vim.opt.relativenumber = false
 vim.opt.wrap = true
 vim.opt.linebreak = true -- Break lines at word boundaries
 
--- Enable kitty keyboard protocol for proper Ctrl+i/j/k/l handling
--- This distinguishes Ctrl+i from Tab
-if os.getenv("TERM") == "xterm-kitty" then
-  vim.cmd([[
-    " Enable kitty keyboard protocol on VimEnter
-    autocmd VimEnter * if &term == "xterm-kitty" | set termguicolors | endif
-  ]])
-end
+vim.opt.cursorline = true
+vim.opt.cursorlineopt = "number"

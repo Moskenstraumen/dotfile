@@ -22,7 +22,7 @@ echo "Space indexes: $SPACE1, $SPACE2, $SPACE3, $SPACE4, $SPACE5, $SPACE6"
 
 # 3. ASSIGN SPACES TO DISPLAYS AND LABEL THEM
 assign_space "$SPACE1" $MAIN "term"
-assign_space "$SPACE2" $MAIN "brow"
+assign_space "$SPACE2" $MAIN "brow" --layout stack
 assign_space "$SPACE3" $VERT "read"
 assign_space "$SPACE4" $VERT "work"
 assign_space "$SPACE5" $BUILT "chat"
@@ -33,7 +33,10 @@ yabai -m display --focus $MAIN 2>/dev/null || true
 
 # 5. DEFINE RULES (Desk Layout)
 # Use labels instead of hardcoded indexes since indexes may vary
-yabai -m rule --add app="^kitty$" space=term
+# Kitty windows by tmux session function
+yabai -m rule --add app="^kitty$" title="^project$" space=term
+yabai -m rule --add app="^kitty$" title="^agent$" space=work
+# Default: any other kitty window goes to term
 yabai -m rule --add app="^Google Chrome$" space=brow
 yabai -m rule --add app="^Zotero$" space=read
 yabai -m rule --add app="^Microsoft Word$" space=read
@@ -45,4 +48,3 @@ yabai -m rule --add app="^Obsidian$" space=note
 yabai -m rule --apply
 
 echo "Desk Mode: 6 Spaces Distributed"
-

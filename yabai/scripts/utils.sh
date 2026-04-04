@@ -64,15 +64,3 @@ get_space_index() {
   local position=$1
   yabai -m query --spaces | jq -r "sort_by(.index) | .[$(($position - 1))] | .index"
 }
-
-# 3. ASSIGN SPACE TO DISPLAY AND LABEL
-# Usage: assign_space <space_index> <display> <label>
-assign_space() {
-  local space_idx=$1
-  local display=$2
-  local label=$3
-
-  echo "Assigning space $space_idx to display $display with label '$label'"
-  yabai -m space "$space_idx" --display "$display" 2>/dev/null || true
-  yabai -m space "$space_idx" --label "$label"
-}

@@ -67,7 +67,7 @@ hyper - 2       : yabai -m space --focus 2
 hyper - 3       : yabai -m space --focus 3
 hyper - 4       : yabai -m space --focus 4
 
-# Focus space (desktop only)
+# Focus space
 hyper - t       : yabai -m space --focus term
 hyper - b       : yabai -m space --focus brow
 hyper - r       : yabai -m space --focus read
@@ -93,6 +93,9 @@ shift + alt - d : yabai -m space --focus prev && yabai -m space next --destroy
 # Cycle forwards on the focused display
 alt - tab       : ~/.config/yabai/scripts/cycle_next.sh
 
+# Cycle through stacked windows in current space
+alt - 0x32      : yabai -m window --focus stack.next || yabai -m window --focus stack.first
+
 ###########################################
 
 # Open apps
@@ -105,8 +108,9 @@ alt - return    : "${HOME}"/.config/yabai/open_kitty.sh
 ###########################################
 
 # Force run the scripts if automation fails
-ctrl + alt - m  : ~/.config/yabai/scripts/mobile.sh
-ctrl + alt - d  : ~/.config/yabai/scripts/desk.sh
+ctrl + alt - s  : ~/.config/yabai/scripts/single.sh
+ctrl + alt - d  : ~/.config/yabai/scripts/double.sh
+ctrl + alt - t  : ~/.config/yabai/scripts/triple.sh
 
 ###########################################
 

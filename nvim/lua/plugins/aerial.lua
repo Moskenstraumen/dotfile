@@ -4,7 +4,7 @@ return {
   event = "VeryLazy",
   opts = {
     -- Priority list of preferred backends for aerial
-    backends = { "lsp", "treesitter", "markdown", "asciidoc", "man" },
+    backends = { "lsp", "treesitter", "asciidoc", "man" },
 
     layout = {
       -- These control the width of the aerial window

@@ -8,5 +8,5 @@ sketchybar \
   label.color="$SBAR_DEFAULT_LABEL_COLOR" \
   --bar \
   position="$SBAR_BAR_POSITION" \
-  height=38 \
+  height=32 \
   color="$SBAR_BAR_COLOR"

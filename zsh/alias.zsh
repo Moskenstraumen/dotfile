@@ -1,4 +1,5 @@
 alias ss="ssh 54.27"
+alias sd="ssh 54.48"
 alias so="ssh oracle"
 
 alias vi=nvim

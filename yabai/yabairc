@@ -38,18 +38,19 @@ yabai -m config mouse_action1 move
 yabai -m config mouse_action2 resize
 
 # Paddings
-yabai -m config top_padding 4
-yabai -m config bottom_padding 4
-yabai -m config left_padding 4
-yabai -m config right_padding 4
-yabai -m config window_gap 4
+yabai -m config top_padding 2
+yabai -m config bottom_padding 2
+yabai -m config left_padding 2
+yabai -m config right_padding 2
+yabai -m config window_gap 2
 
 ###########################################
 
-# Run mobile script when display removed
-yabai -m signal --add event=display_removed action="~/.config/yabai/scripts/mobile.sh"
-# Run desk script when display added
-yabai -m signal --add event=display_added action="~/.config/yabai/scripts/desk.sh"
+# Detect display count and run appropriate script when display is removed
+yabai -m signal --add event=display_removed action='COUNT=$(yabai -m query --displays | jq "length"); if [ "$COUNT" -eq 1 ]; then bash "$HOME/.config/yabai/scripts/single.sh"; elif [ "$COUNT" -eq 2 ]; then bash "$HOME/.config/yabai/scripts/double.sh"; fi'
+
+# Detect display count and run appropriate script when display is added
+yabai -m signal --add event=display_added action='COUNT=$(yabai -m query --displays | jq "length"); if [ "$COUNT" -eq 2 ]; then bash "$HOME/.config/yabai/scripts/double.sh"; elif [ "$COUNT" -eq 3 ]; then bash "$HOME/.config/yabai/scripts/triple.sh"; fi'
 
 # SketchyBar event signals
 yabai -m signal --add event=window_focused action="sketchybar --trigger yabai_window_focus"
@@ -76,12 +77,19 @@ yabai -m rule --add app="^Spotify$" manage=off
 yabai -m rule --add app="^Tailscale$" manage=off
 
 # Initial setup based on current display count
-display_count=$(yabai -m query --displays | jq 'length')
-if [ "$display_count" -gt 1 ]; then
-  ~/.config/yabai/scripts/desk.sh
-else
-  ~/.config/yabai/scripts/mobile.sh
-fi
+# Use bash to run script in background with delay to ensure yabai is ready
+(
+  sleep 2
+  display_count=$(yabai -m query --displays | jq 'length')
+
+  if [ "$display_count" -eq 1 ]; then
+    bash "$HOME/.config/yabai/scripts/single.sh"
+  elif [ "$display_count" -eq 2 ]; then
+    bash "$HOME/.config/yabai/scripts/double.sh"
+  else
+    bash "$HOME/.config/yabai/scripts/triple.sh"
+  fi
+) &
 
 yabai -m rule --apply
 

@@ -10,12 +10,10 @@ SPACE2=$(get_space_index 2)
 SPACE3=$(get_space_index 3)
 SPACE4=$(get_space_index 4)
 
-echo "Space indexes: $SPACE1, $SPACE2, $SPACE3, $SPACE4"
-
 # 3. LABEL THE SPACES (all on built-in display already)
-yabai -m space "$SPACE1" --label "term"
+yabai -m space "$SPACE1" --label "term" --layout stack
 yabai -m space "$SPACE2" --label "brow" --layout stack
-yabai -m space "$SPACE3" --label "work" --layout stack
+yabai -m space "$SPACE3" --label "work"
 yabai -m space "$SPACE4" --label "chat" --layout stack
 
 # 4. DISABLE GAPPING FOR MOBILE MODE
@@ -38,5 +36,3 @@ yabai -m rule --add app="^Obsidian$" space=chat
 
 # 6. APPLY RULES
 yabai -m rule --apply
-
-echo "Mobile Mode: 4 Spaces Configured"

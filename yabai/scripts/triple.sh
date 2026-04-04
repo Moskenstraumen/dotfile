@@ -18,20 +18,26 @@ SPACE4=$(get_space_index 4)
 SPACE5=$(get_space_index 5)
 SPACE6=$(get_space_index 6)
 
-echo "Space indexes: $SPACE1, $SPACE2, $SPACE3, $SPACE4, $SPACE5, $SPACE6"
+# 3. ASSIGN SPACES TO DISPLAYS
+yabai -m space "$SPACE1" --display $MAIN 2>/dev/null || true
+yabai -m space "$SPACE2" --display $MAIN 2>/dev/null || true
+yabai -m space "$SPACE3" --display $VERT 2>/dev/null || true
+yabai -m space "$SPACE4" --display $VERT 2>/dev/null || true
+yabai -m space "$SPACE5" --display $BUILT 2>/dev/null || true
+yabai -m space "$SPACE6" --display $BUILT 2>/dev/null || true
 
-# 3. ASSIGN SPACES TO DISPLAYS AND LABEL THEM
-assign_space "$SPACE1" $MAIN "term"
-assign_space "$SPACE2" $MAIN "brow" --layout stack
-assign_space "$SPACE3" $VERT "read"
-assign_space "$SPACE4" $VERT "work"
-assign_space "$SPACE5" $BUILT "chat"
-assign_space "$SPACE6" $BUILT "note"
+# 4. LABEL SPACES AND SET LAYOUT
+yabai -m space "$SPACE1" --label "term" --layout stack
+yabai -m space "$SPACE2" --label "brow" --layout stack
+yabai -m space "$SPACE3" --label "read"
+yabai -m space "$SPACE4" --label "work"
+yabai -m space "$SPACE5" --label "chat"
+yabai -m space "$SPACE6" --label "note"
 
-# 4. FOCUS MAIN DISPLAY (Optional nice touch)
+# 5. FOCUS MAIN DISPLAY (Optional nice touch)
 yabai -m display --focus $MAIN 2>/dev/null || true
 
-# 5. DEFINE RULES (Desk Layout)
+# 6. DEFINE RULES (Desk Layout)
 # Use labels instead of hardcoded indexes since indexes may vary
 # Kitty windows by tmux session function
 yabai -m rule --add app="^kitty$" title="^project$" space=term
@@ -44,7 +50,5 @@ yabai -m rule --add app="^Feishu$" space=chat
 yabai -m rule --add app="^WeChat$" space=chat
 yabai -m rule --add app="^Obsidian$" space=note
 
-# 6. APPLY RULES
+# 7. APPLY RULES
 yabai -m rule --apply
-
-echo "Desk Mode: 6 Spaces Distributed"

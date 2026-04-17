@@ -32,3 +32,6 @@ mole/
 karabiner/automatic_backups/*
 
 .claude/
+ccstatusline/
+sketchybar_backup/
+tmux-client-*.log

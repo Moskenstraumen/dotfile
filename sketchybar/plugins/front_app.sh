@@ -1,15 +1,10 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
-# Sketchybar environment variables
-: "${INFO:=}"
+# Some events send additional information specific to the event in the $INFO
+# variable. E.g. the front_app_switched event sends the name of the newly
+# focused application in the $INFO variable:
+# https://felixkratz.github.io/SketchyBar/config/events#events-and-scripting
 
-source "$CONFIG_DIR/tokens/colors.sh"
-source "$CONFIG_DIR/plugins/icon.sh"
-
-if [ -n "$INFO" ]; then
-  APP_NAME="$INFO"
-  ICON=$(get_app_icon "$APP_NAME")
-
-  sketchybar --set front_app.icon icon="$ICON"
-  sketchybar --set front_app.name label="$APP_NAME"
+if [ "$SENDER" = "front_app_switched" ]; then
+  sketchybar --set "$NAME" label="$INFO"
 fi

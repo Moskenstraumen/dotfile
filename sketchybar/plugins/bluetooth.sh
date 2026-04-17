@@ -1,19 +1,29 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-source "$CONFIG_DIR/plugins/icon.sh"
-source "$CONFIG_DIR/core/env.sh"
-source "$CONFIG_DIR/plugins/helpers.sh"
+DEVICE="2C:BE:EE:4B:7F:68"
+CONNECTED_ICON="󰂯"   # Nerd Font Bluetooth icon connected
+DISCONNECTED_ICON="󰂲" # Nerd Font Bluetooth icon disconnected
+HIGHLIGHT_COLOR="0xffD27E99"  # Kanagawa SakuraPink
+DEFAULT_COLOR="0xff7E9CD8"    # Kanagawa WaveBlue1
 
-BT_STATE=$(system_profiler SPBluetoothDataType 2>/dev/null | grep "State:" | awk '{print $2}')
+update() {
+  if [ "$(blueutil --is-connected "$DEVICE")" = "1" ]; then
+    sketchybar --set "$NAME" icon="$CONNECTED_ICON" icon.color="$HIGHLIGHT_COLOR"
+  else
+    sketchybar --set "$NAME" icon="$DISCONNECTED_ICON" icon.color="$DEFAULT_COLOR"
+  fi
+}
 
-if [ "$BT_STATE" = "On" ]; then
-  ICON=$(get_widget_icon "bluetooth")
-  COLOR="$SBAR_COLOR_BLUETOOTH"
-  ICON_FONT_SIZE="$(calc "$SBAR_ICON_FONT_SIZE - 3")"
-else
-  ICON=$(get_widget_icon "bluetooth_off")
-  COLOR="$COLOR_RED"
-  ICON_FONT_SIZE=$SBAR_ICON_FONT_SIZE
-fi
+mouse_clicked() {
+  if [ "$(blueutil --is-connected "$DEVICE")" = "1" ]; then
+    osascript -e 'tell application "Spotify" to playpause'
+    blueutil --disconnect "$DEVICE"
+  else
+    blueutil --connect "$DEVICE"
+  fi
+}
 
-sketchybar --set bluetooth.icon icon="$ICON" icon.color="$COLOR" icon.font="$SBAR_ICON_FONT_FACE_BOLD:$ICON_FONT_SIZE"
+case "$SENDER" in
+  "mouse.clicked") mouse_clicked ;;
+  *) update ;;
+esac

@@ -16,5 +16,5 @@ alias vs="nvim ~/.config/starship.toml"
 alias show='kitty +kitten icat'
 alias kdiff='kitty +kitten diff'
 
-alias proxyon='export http_proxy=http://127.0.0.1:7897 ; HTTP_PROXY=http://127.0.0.1:7897 ; https_proxy=http://127.0.0.1:7897 ; HTTPS_PROXY=http://127.0.0.1:7897'
-alias proxyoff='unset http_proxy=http://127.0.0.1:7897 ; HTTP_PROXY=http://127.0.0.1:7897 ; https_proxy=http://127.0.0.1:7897 ; HTTPS_PROXY=http://127.0.0.1:7897'
+alias proxy_on='export http_proxy=http://127.0.0.1:7890 ; HTTP_PROXY=http://127.0.0.1:7890 ; https_proxy=http://127.0.0.1:7890 ; HTTPS_PROXY=http://127.0.0.1:7890'
+alias proxy_off='unset http_proxy=http://127.0.0.1:7890 ; HTTP_PROXY=http://127.0.0.1:7890 ; https_proxy=http://127.0.0.1:7890 ; HTTPS_PROXY=http://127.0.0.1:7890'

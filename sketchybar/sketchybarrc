@@ -1,16 +1,303 @@
 #!/usr/bin/env bash
 
-export SBAR_PLUGIN_DIR="$CONFIG_DIR/plugins"
-export SBAR_ITEM_DIR="$CONFIG_DIR/items"
-export SBAR_EVENT_DIR="$CONFIG_DIR/events"
+CONFIG_DIR="${CONFIG_DIR:-$HOME/.config/sketchybar}"
+PLUGIN_DIR="$CONFIG_DIR/plugins"
 
-source "$CONFIG_DIR/core/env.sh"
-source "$CONFIG_DIR/core/init_widgets.sh"
-source "$CONFIG_DIR/core/bar_defaults.sh"
-source "$CONFIG_DIR/core/loader.sh"
-source "$CONFIG_DIR/core/load_widgets.sh"
-source "$CONFIG_DIR/core/styles.sh"
+#########################################
+#  KANAGAWA WAVE – Muted Elegance Theme #
+#########################################
+# Inspired by Kanagawa & Catppuccin
+# Soft, earthy tones with subtle accents
 
+# Base colors (Kanagawa-inspired)
+BG_BASE="0x1f1f28"    # Deep background
+BG_SURFACE="0x2a2a37" # Surface layer
+BG_OVERLAY="0x363646" # Overlay/highlight
+
+# Muted accent colors
+WAVE_BLUE="0x7e9cd8"     # Soft wave blue
+SPRING_VIOLET="0x957fb8" # Gentle violet
+AUTUMN_RED="0xc34043"    # Muted red
+WAVE_AQUA="0x7fb4ca"     # Calm aqua
+SPRING_GREEN="0x98bb6c"  # Soft green
+AUTUMN_YELLOW="0xdca561" # Warm yellow
+SAKURA_PINK="0xd27e99"   # Gentle pink
+OLD_WHITE="0xdcd7ba"     # Aged white
+
+# Text colors
+FG_PRIMARY="0xdcd7ba"   # Main text
+FG_SECONDARY="0xc8c093" # Secondary text
+FG_DIM="0x727169"       # Dimmed text
+
+##############################
+#  Bar – Transparent         #
+##############################
+
+sketchybar --bar position=top \
+  height=32 \
+  color=0x00000000 \
+  shadow=off \
+  sticky=on \
+  padding_left=10 \
+  padding_right=10 \
+  corner_radius=0 \
+  border_width=0 \
+  blur_radius=0 \
+  y_offset=0
+
+################################
+#  Global defaults             #
+################################
+
+MODULE_BG_ALPHA="d0"     # More opaque for visibility
+MODULE_BORDER_ALPHA="40" # Subtle borders
+
+default=(
+  padding_left=6
+  padding_right=6
+
+  icon.font="Maple Mono NF CN:Bold:14.0"
+  label.font="Maple Mono NF CN:Medium:13.0"
+
+  icon.font.size=14.0
+  label.font.size=13.0
+
+  icon.color=0xff${WAVE_BLUE:2}
+  label.color=0xff${FG_PRIMARY:2}
+
+  icon.padding_left=6
+  icon.padding_right=4
+  label.padding_left=4
+  label.padding_right=6
+
+  background.color=0x${MODULE_BG_ALPHA}${BG_SURFACE:2}
+  background.corner_radius=10
+  background.height=28
+  background.border_width=1
+  background.border_color=0x${MODULE_BORDER_ALPHA}${WAVE_BLUE:2}
+  background.shadow.drawing=off
+)
+
+sketchybar --default "${default[@]}"
+
+################################
+#  Blur Brackets               #
+################################
+
+# Left blur bracket
+sketchybar --add bracket left_group '/portal/' '/cosmic_sep/' '/yabai_space\..*/' '/front_app/' \
+  --set left_group background.color=0xd0${BG_BASE:2} \
+  background.corner_radius=16 \
+  background.height=34 \
+  background.border_width=1 \
+  background.border_color=0x30${WAVE_BLUE:2} \
+  blur_radius=30
+
+# Right blur bracket
+sketchybar --add bracket right_group '/clock/' '/battery/' '/volume/' '/spotify\..*/' \
+  --set right_group background.color=0xd0${BG_BASE:2} \
+  background.corner_radius=16 \
+  background.height=34 \
+  background.border_width=1 \
+  background.border_color=0x30${WAVE_BLUE:2} \
+  blur_radius=30
+
+################################
+#  LEFT: Portal + Spaces       #
+################################
+
+sketchybar --add item portal left \
+  --set portal icon=󰀘 \
+  icon.font="Maple Mono NF CN:Bold:14.0" \
+  icon.color=0xff${SAKURA_PINK:2} \
+  background.color=0x00000000 \
+  background.corner_radius=0 \
+  background.border_width=0 \
+  background.shadow.drawing=off \
+  label.drawing=off \
+  icon.padding_left=6 \
+  icon.padding_right=6 \
+  padding_left=2 \
+  padding_right=0
+
+sketchybar --add item cosmic_sep left \
+  --set cosmic_sep icon=│ \
+  icon.color=0x40${FG_DIM:2} \
+  background.drawing=off \
+  label.drawing=off \
+  icon.padding_left=6 \
+  icon.padding_right=6 \
+  padding_left=0 \
+  padding_right=0
+
+############################
+#  Workspaces              #
+############################
+
+SPACE_ICONS=("1" "2" "3" "4" "5" "6" "7" "8" "9" "10")
+SPACE_COLORS=(
+  "${WAVE_BLUE:2}" "${SPRING_VIOLET:2}" "${SAKURA_PINK:2}" "${WAVE_AQUA:2}" "${SPRING_GREEN:2}"
+  "${AUTUMN_YELLOW:2}" "${AUTUMN_RED:2}" "${WAVE_BLUE:2}" "${SPRING_VIOLET:2}" "${SAKURA_PINK:2}"
+)
+
+workspace_count=$(yabai -m query --spaces 2>/dev/null | jq 'length' 2>/dev/null || echo 0)
+max_spaces=${#SPACE_ICONS[@]}
+
+for ((i = 0; i < max_spaces; i++)); do
+  sid=$((i + 1))
+  color_index=$((i % ${#SPACE_COLORS[@]}))
+  space_color="${SPACE_COLORS[color_index]}"
+
+  # Hide items beyond the current workspace count
+  if ((i < workspace_count)); then
+    visible="on"
+  else
+    visible="off"
+  fi
+
+  space=(
+    drawing=$visible
+    icon="${SPACE_ICONS[i]}"
+    icon.color=0xb0$space_color
+    icon.highlight_color=0xff${FG_PRIMARY:2}
+    icon.font.size=15.0
+    background.color=0x00000000
+    background.corner_radius=8
+    background.border_width=0
+    background.height=24
+    background.shadow.drawing=off
+    label.drawing=off
+    label.color=0xff${FG_SECONDARY:2}
+    label.font="Maple Mono NF CN:Bold:14.0"
+    label.padding_left=4
+    label.padding_right=4
+  )
+
+  sketchybar --add item "yabai_space.$sid" left \
+    --set "yabai_space.$sid" "${space[@]}" \
+    click_script="yabai -m space --focus $sid"
+done
+
+sketchybar --add event yabai_space_changed
+sketchybar --add item yabai_updater left \
+  --set yabai_updater script="$PLUGIN_DIR/yabai_workspaces.sh" \
+  update_freq=3 \
+  drawing=off \
+  --subscribe yabai_updater space_change yabai_space_changed
+
+################################
+#  LEFT: Apps & Controls       #
+################################
+
+sketchybar --add item front_app left \
+  --set front_app icon.drawing=off \
+  background.color=0x00000000 \
+  background.corner_radius=0 \
+  background.border_width=0 \
+  background.shadow.drawing=off \
+  label.color=0xff${FG_PRIMARY:2} \
+  label.font="Maple Mono NF CN:SemiBold:13.0" \
+  script="$PLUGIN_DIR/front_app.sh" \
+  --subscribe front_app front_app_switched
+
+
+################################
+#  RIGHT: System Monitors      #
+################################
+
+sketchybar --add item clock right \
+  --set clock icon=󰥔 \
+  icon.font.size=14.0 \
+  icon.color=0xff${WAVE_BLUE:2} \
+  label.color=0xff${FG_PRIMARY:2} \
+  label.font="Maple Mono NF CN:SemiBold:13.0" \
+  background.color=0x00000000 \
+  background.corner_radius=0 \
+  background.border_width=0 \
+  background.shadow.drawing=off \
+  update_freq=1 \
+  script="$PLUGIN_DIR/clock.sh"
+
+sketchybar --add item battery right \
+  --set battery icon=󰁹 \
+  icon.font.size=14.0 \
+  icon.color=0xff${SPRING_GREEN:2} \
+  label.color=0xff${FG_SECONDARY:2} \
+  background.color=0x00000000 \
+  background.corner_radius=0 \
+  background.border_width=0 \
+  background.shadow.drawing=off \
+  update_freq=60 \
+  script="$PLUGIN_DIR/battery.sh" \
+  --subscribe battery system_woke power_source_change
+
+sketchybar --add item volume right \
+  --set volume icon=󰕾 \
+  icon.font.size=14.0 \
+  icon.color=0xff${SAKURA_PINK:2} \
+  label.color=0xff${FG_SECONDARY:2} \
+  background.color=0x00000000 \
+  background.corner_radius=0 \
+  background.border_width=0 \
+  background.shadow.drawing=off \
+  script="$PLUGIN_DIR/volume.sh" \
+  --subscribe volume volume_change
+
+#######################################
+#  Spotify Player                     #
+#######################################
+
+SPOTIFY_EVENT="com.spotify.client.PlaybackStateChanged"
+POPUP_SCRIPT="sketchybar -m --set \$NAME popup.drawing=toggle"
+
+sketchybar --add event spotify_change $SPOTIFY_EVENT \
+  --add item spotify.name right \
+  --set spotify.name icon=󰓇 \
+  icon.font.size=15.0 \
+  label="" \
+  label.drawing=off \
+  label.color=0xff${FG_PRIMARY:2} \
+  label.font="Maple Mono NF CN:SemiBold:13.0" \
+  icon.color=0xff${SPRING_VIOLET:2} \
+  background.color=0x00000000 \
+  background.corner_radius=0 \
+  background.border_width=0 \
+  background.shadow.drawing=off \
+  click_script="$POPUP_SCRIPT" \
+  popup.horizontal=on \
+  popup.align=center \
+  popup.background.color=0xf0${BG_SURFACE:2} \
+  popup.background.corner_radius=12 \
+  popup.background.border_width=1 \
+  popup.background.border_color=0x60${SPRING_VIOLET:2} \
+  popup.background.shadow.drawing=off
+
+controls=("back:󰒮:${WAVE_AQUA:2}" "play:󰐊:${SPRING_GREEN:2}" "next:󰒭:${WAVE_AQUA:2}" "shuffle:󰒝:${SPRING_VIOLET:2}" "repeat:󰑖:${AUTUMN_YELLOW:2}")
+
+for ctrl in "${controls[@]}"; do
+  IFS=':' read -r name icon color <<<"$ctrl"
+
+  sketchybar --add item "spotify.$name" popup.spotify.name \
+    --set "spotify.$name" icon="$icon" \
+    icon.font.size=15.0 \
+    icon.color=0xff$color \
+    icon.highlight_color=0xff${SPRING_GREEN:2} \
+    icon.padding_left=8 \
+    icon.padding_right=8 \
+    background.color=0x50${BG_OVERLAY:2} \
+    background.corner_radius=8 \
+    background.border_width=1 \
+    background.border_color=0x30$color \
+    background.shadow.drawing=off \
+    label.drawing=off \
+    updates=on \
+    script="$PLUGIN_DIR/spotify.sh" \
+    --subscribe "spotify.$name" mouse.clicked spotify_change
+done
+
+#################
+#  Final launch #
+#################
+
+echo "🌊 Kanagawa Wave theme loaded - muted elegance"
 sketchybar --update
-
-source "$CONFIG_DIR/core/events.sh"

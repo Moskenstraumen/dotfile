@@ -23,6 +23,7 @@ fi
 [ -f "$HOME/.config/starship.toml" ] || ln -s $HOME/dotfile/starship.toml $HOME/.config/starship.toml
 [ -d "$HOME/.config/zsh" ] || mkdir -p $HOME/.config/zsh
 [ -f "$HOME/.config/zsh/alias.zsh" ] || ln -s $HOME/dotfile/zsh/alias.zsh $HOME/.config/zsh/alias.zsh
+[ -f "$HOME/.tmux.conf" ] || ln -s $HOME/dotfile/tmux.conf.remote $HOME/.tmux.conf
 
 # installations of all the tools I need
 [ -x "$(command -v cargo)" ] || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh

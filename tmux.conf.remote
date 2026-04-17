@@ -1,0 +1,10 @@
+# Source shared config
+source-file ~/dotfile/tmux.conf
+
+# Override prefix to Ctrl-a for nested tmux
+unbind C-b
+set-option -g prefix C-a
+bind-key C-a send-prefix
+
+# Re-bind reload to source this file instead
+bind r source-file ~/.tmux.conf \; display-message "~/.tmux.conf reloaded."

@@ -1,4 +1,5 @@
 unfunction yazi _run_yazi _kitty_user_var 2>/dev/null || true
+unalias proxy_on proxy_off 2>/dev/null || true
 
 alias ss="ssh 54.27"
 alias sd="ssh 54.48"

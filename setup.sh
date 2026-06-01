@@ -60,6 +60,9 @@ if [ ! -x "$(command -v yazi)" ] || [ ! -x "$(command -v ya)" ]; then
 			cargo install --force --locked yazi-fm yazi-cli --version 26.1.22
 	fi
 fi
+if [ -x "$(command -v ya)" ] && [ -f "$HOME/.config/yazi/package.toml" ]; then
+	ya pkg install
+fi
 if [ ! -x "$(command -v lazygit)" ]; then
 	curl -Lo lazygit.tar.gz https://github.com/jesseduffield/lazygit/releases/download/v0.45.2/lazygit_0.45.2_$(uname -s)_$(uname -m).tar.gz
 	mkdir lazygit

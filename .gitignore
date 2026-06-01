@@ -4,6 +4,7 @@
 # Local generated files
 *.bak
 *.log
+yazi/plugins/git.yazi/
 
 # Tags
 tags

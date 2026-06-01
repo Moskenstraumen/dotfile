@@ -16,23 +16,47 @@ if [ ! -x "$(command -v curl)" ]; then
 	echo "Exiting..."
 	exit 1
 fi
+if [ ! -x "$(command -v git)" ]; then
+	echo "git is required for pulling shell and tmux plugins"
+	echo "Exiting..."
+	exit 1
+fi
 
 # create symlinks of my dotfiles (will not override if already exists)
 [ -d "$HOME/.config" ] || mkdir -p $HOME/.config
 [ -d "$HOME/.config/nvim" ] || ln -s $HOME/dotfile/nvim $HOME/.config/nvim
+[ -d "$HOME/.config/yazi" ] || ln -s $HOME/dotfile/yazi $HOME/.config/yazi
 [ -f "$HOME/.config/starship.toml" ] || ln -s $HOME/dotfile/starship.toml $HOME/.config/starship.toml
 [ -d "$HOME/.config/zsh" ] || mkdir -p $HOME/.config/zsh
+[ -f "$HOME/.config/zsh/zshrc" ] || ln -s $HOME/dotfile/zsh/zshrc.remote $HOME/.config/zsh/zshrc
 [ -f "$HOME/.config/zsh/alias.zsh" ] || ln -s $HOME/dotfile/zsh/alias.zsh $HOME/.config/zsh/alias.zsh
-[ -f "$HOME/.tmux.conf" ] || ln -s $HOME/dotfile/tmux.conf.remote $HOME/.tmux.conf
+[ -f "$HOME/.zshrc" ] || ln -s $HOME/.config/zsh/zshrc $HOME/.zshrc
+[ -f "$HOME/.tmux.conf" ] || ln -s $HOME/dotfile/tmux/tmux.conf.remote $HOME/.tmux.conf
+
+# shell and tmux plugins
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+	RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+ZSH_CUSTOM=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}
+[ -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ] || git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+[ -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ] || git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+[ -d "$HOME/.tmux/plugins/tpm" ] || git clone --depth=1 https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
 
 # installations of all the tools I need
-[ -x "$(command -v cargo)" ] || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+[ -x "$(command -v cargo)" ] || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 mkdir -p $HOME/.local/bin
 mkdir -p $HOME/.local/share $HOME/.local/lib
 export PATH=${HOME}/.cargo/bin:${HOME}/.local/bin:${PATH}
+if ! grep -Fq '. "$HOME/.cargo/env"' $HOME/.zshenv 2>/dev/null; then
+	echo '. "$HOME/.cargo/env"' >> $HOME/.zshenv
+fi
 [ -x "$(command -v starship)" ] || curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir $INSTALLDIR --yes
 [ -x "$(command -v rg)" ] || cargo install ripgrep
 [ -x "$(command -v fd)" ] || cargo install fd-find
+if [ ! -x "$(command -v yazi)" ] || [ ! -x "$(command -v ya)" ]; then
+	[ -x "$(command -v rustup)" ] && rustup update
+	cargo install --force yazi-build
+fi
 if [ ! -x "$(command -v lazygit)" ]; then
 	curl -Lo lazygit.tar.gz https://github.com/jesseduffield/lazygit/releases/download/v0.45.2/lazygit_0.45.2_$(uname -s)_$(uname -m).tar.gz
 	mkdir lazygit

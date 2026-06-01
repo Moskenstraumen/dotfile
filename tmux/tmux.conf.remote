@@ -37,7 +37,7 @@ set -g status-left '#[fg=#cba6f7] #S#[fg=black] ⟩ #(echo "#{pane_current_path}
   }'\'') '
 set -g status-left-length 50
 
-set -g status-right "#h"
+set -g status-right "#(hostname -s)"
 
 set -g copy-mode-match-style 'fg=#1e1e2e,bg=#cdd6f4'
 set -g copy-mode-current-match-style 'fg=#1e1e2e,bg=#d20f39'
@@ -55,24 +55,22 @@ set -g window-status-current-format "#{window_index} #W#{?window_zoomed_flag, , 
 # │                         Options                          │
 # ╰──────────────────────────────────────────────────────────╯
 
-# Set true color and cursor style passthrough
+# Set true color
 set-option -g  default-terminal "tmux-256color"
 set-option -as terminal-overrides ",xterm*:Tc"
 set-option -as terminal-overrides ",*:Ss=\\E[%p1%d q:Se=\\E[2 q"
-set-option -as terminal-features ",xterm-kitty:RGB"
-set -s  extended-keys on
-set -as terminal-features ",xterm-kitty:extkeys"
+set-option -as terminal-features ',xterm-kitty:RGB'
 
-set -g set-clipboard on
 set -g cursor-style block
 set -g mouse on
 set -g base-index 1
 set -g pane-base-index 1
+set-window-option -g pane-base-index 1
 set-option -g renumber-windows on
 set-window-option -g mode-keys vi
 set-option -g allow-rename on
-set -sg escape-time 5
-set -sg repeat-time 0
+set -sg escape-time 10
+set -sg repeat-time 10
 
 # Update terminal (kitty) title with tmux session name
 set-option -g set-titles on
@@ -80,6 +78,7 @@ set-option -g set-titles-string "#S"
 
 # yazi/zsh support
 set -g allow-passthrough on
+set -ga update-environment TERM
 set -ga update-environment TERM_PROGRAM
 
 # ╭──────────────────────────────────────────────────────────╮
@@ -88,7 +87,9 @@ set -ga update-environment TERM_PROGRAM
 
 # Use default Ctrl+b prefix (no change needed)
 # If you want to see options:
-# bind o show-options -g
+unbind C-b
+set-option -g prefix C-a
+bind-key C-a send-prefix
 
 # Visual mode (vim-style)
 bind -T copy-mode-vi v send-keys -X begin-selection
@@ -105,8 +106,6 @@ bind c new-window -c ~
 
 # Clear scrollback buffer
 bind K send-keys "clear"\; send-keys "Enter"\; clear-history
-
-bind a setw synchronize-panes \; display "Sync #{?pane_synchronized,ON,OFF}"
 
 # Reload tmux.conf
 bind r source-file ~/.tmux.conf \; display-message "~/.tmux.conf reloaded."

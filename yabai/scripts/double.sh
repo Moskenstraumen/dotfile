@@ -22,9 +22,9 @@ yabai -m space "$SPACE3" --display $BUILT 2>/dev/null || true
 yabai -m space "$SPACE4" --display $BUILT 2>/dev/null || true
 
 # 4. LABEL SPACES AND SET LAYOUT
-yabai -m space "$SPACE1" --label "term" --layout stack
+yabai -m space "$SPACE1" --label "work" --layout stack
 yabai -m space "$SPACE2" --label "brow" --layout stack
-yabai -m space "$SPACE3" --label "work"
+yabai -m space "$SPACE3" --label "edit"
 yabai -m space "$SPACE4" --label "chat" --layout stack
 
 # 5. FOCUS MAIN DISPLAY (Optional nice touch)
@@ -32,13 +32,12 @@ yabai -m display --focus $MAIN 2>/dev/null || true
 
 # 6. DEFINE RULES
 # Use labels instead of hardcoded indexes since indexes may vary
-# Kitty windows by tmux session function
-yabai -m rule --add app="^kitty$" title="^project$" space=term
-yabai -m rule --add app="^kitty$" title="^agent$" space=term
+yabai -m rule --add app="^Codex$" space=work
+yabai -m rule --add app="^kitty$" space=work
 # Default: any other kitty window goes to term
 yabai -m rule --add app="^Google Chrome$" space=brow
 yabai -m rule --add app="^Zotero$" space=brow
-yabai -m rule --add app="^Microsoft Word$" space=brow
+yabai -m rule --add app="^Code$" space=edit
 yabai -m rule --add app="^Feishu$" space=chat
 yabai -m rule --add app="^WeChat$" space=chat
 yabai -m rule --add app="^Obsidian$" space=chat

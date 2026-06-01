@@ -11,9 +11,9 @@ SPACE3=$(get_space_index 3)
 SPACE4=$(get_space_index 4)
 
 # 3. LABEL THE SPACES (all on built-in display already)
-yabai -m space "$SPACE1" --label "term" --layout stack
+yabai -m space "$SPACE1" --label "work" --layout stack
 yabai -m space "$SPACE2" --label "brow" --layout stack
-yabai -m space "$SPACE3" --label "work"
+yabai -m space "$SPACE3" --label "edit"
 yabai -m space "$SPACE4" --label "chat" --layout stack
 
 # 4. DISABLE GAPPING FOR MOBILE MODE
@@ -25,14 +25,16 @@ yabai -m config window_gap 0
 
 # 5. DEFINE RULES (Mobile Layout)
 # Use labels instead of hardcoded indexes
+yabai -m rule --add app="^Codex$" space=work
 # All kitty windows on term space for easy access in single monitor
-yabai -m rule --add app="^kitty$" space=term
+yabai -m rule --add app="^kitty$" space=work
 yabai -m rule --add app="^Google Chrome$" space=brow
-yabai -m rule --add app="^Microsoft Word$" space=work
-yabai -m rule --add app="^Zotero$" space=work
+yabai -m rule --add app="^Zotero$" space=brow
+yabai -m rule --add app="^Code$" space=edit
+yabai -m rule --add app="^Microsoft Word$" space=edit
 yabai -m rule --add app="^Feishu$" space=chat
-yabai -m rule --add app="^WeChat$" space=chat
 yabai -m rule --add app="^Obsidian$" space=chat
+yabai -m rule --add app="^WeChat$" space=chat
 
 # 6. APPLY RULES
 yabai -m rule --apply

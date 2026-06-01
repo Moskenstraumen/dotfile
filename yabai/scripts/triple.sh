@@ -27,10 +27,10 @@ yabai -m space "$SPACE5" --display $BUILT 2>/dev/null || true
 yabai -m space "$SPACE6" --display $BUILT 2>/dev/null || true
 
 # 4. LABEL SPACES AND SET LAYOUT
-yabai -m space "$SPACE1" --label "term" --layout stack
+yabai -m space "$SPACE1" --label "work" --layout stack
 yabai -m space "$SPACE2" --label "brow" --layout stack
 yabai -m space "$SPACE3" --label "read"
-yabai -m space "$SPACE4" --label "work"
+yabai -m space "$SPACE4" --label "edit"
 yabai -m space "$SPACE5" --label "chat"
 yabai -m space "$SPACE6" --label "note"
 
@@ -39,13 +39,13 @@ yabai -m display --focus $MAIN 2>/dev/null || true
 
 # 6. DEFINE RULES (Desk Layout)
 # Use labels instead of hardcoded indexes since indexes may vary
-# Kitty windows by tmux session function
-yabai -m rule --add app="^kitty$" title="^project$" space=term
-yabai -m rule --add app="^kitty$" title="^agent$" space=work
+yabai -m rule --add app="^Codex$" space=work
 # Default: any other kitty window goes to term
 yabai -m rule --add app="^Google Chrome$" space=brow
 yabai -m rule --add app="^Zotero$" space=read
 yabai -m rule --add app="^Microsoft Word$" space=read
+yabai -m rule --add app="^Code$" space=edit
+yabai -m rule --add app="^kitty$" title="^top$" space=edit
 yabai -m rule --add app="^Feishu$" space=chat
 yabai -m rule --add app="^WeChat$" space=chat
 yabai -m rule --add app="^Obsidian$" space=note

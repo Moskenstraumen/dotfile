@@ -23,3 +23,15 @@ prepend_rules = [
   { url = "*.yaml", use = "edit" },
   { url = "*.yml", use = "edit" },
 ]
+
+[[plugin.prepend_fetchers]]
+id = "git"
+url = "*"
+run = "git"
+group = "git"
+
+[[plugin.prepend_fetchers]]
+id = "git"
+url = "*/"
+run = "git"
+group = "git"

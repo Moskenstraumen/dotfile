@@ -19,6 +19,8 @@ alias la='ls -A'
 alias l='ls -CF'
 alias vi='vim'
 
+[[ -f ~/.config/zsh/alias.zsh ]] && source ~/.config/zsh/alias.zsh
+
 # Enhanced history
 HISTSIZE=10000
 SAVEHIST=10000

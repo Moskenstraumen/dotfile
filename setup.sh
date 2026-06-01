@@ -54,8 +54,11 @@ fi
 [ -x "$(command -v rg)" ] || cargo install ripgrep
 [ -x "$(command -v fd)" ] || cargo install fd-find
 if [ ! -x "$(command -v yazi)" ] || [ ! -x "$(command -v ya)" ]; then
-	[ -x "$(command -v rustup)" ] && rustup update
-	cargo install --force yazi-build
+	if ! cargo install --force --locked yazi-build || [ ! -x "$(command -v yazi)" ] || [ ! -x "$(command -v ya)" ]; then
+		echo "Latest yazi-build failed; falling back to yazi 26.1.22 for older Rust toolchains."
+		YAZI_CRATE_BUILD=1 VERGEN_GIT_SHA=Crates.io JEMALLOC_SYS_WITH_LG_PAGE=16 JEMALLOC_SYS_WITH_MALLOC_CONF=narenas:1 \
+			cargo install --force --locked yazi-fm yazi-cli --version 26.1.22
+	fi
 fi
 if [ ! -x "$(command -v lazygit)" ]; then
 	curl -Lo lazygit.tar.gz https://github.com/jesseduffield/lazygit/releases/download/v0.45.2/lazygit_0.45.2_$(uname -s)_$(uname -m).tar.gz

@@ -1,6 +1,10 @@
 # macOS
 .DS_Store
 
+# Local generated files
+*.bak
+*.log
+
 # Tags
 tags
 .tags

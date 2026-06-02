@@ -15,6 +15,10 @@ map({ "n", "v", "o" }, "i", "k", { desc = "Move up" })
 map({ "n", "v", "o" }, "k", "j", { desc = "Move down" })
 map({ "n", "v", "o" }, "l", "l", { desc = "Move right" })
 
+-- Yank to the system clipboard without sending deletes there.
+map({ "n", "x" }, "y", '"+y', { desc = "Yank to Clipboard" })
+map("n", "Y", '"+Y', { desc = "Yank Line to Clipboard" })
+
 -- Remap h to insert mode (since i is now up)
 map("n", "h", "i", { desc = "Insert mode" })
 map("n", "H", "I", { desc = "Insert at line start" })
@@ -56,4 +60,3 @@ map("n", "<leader>9", function() require('bufferline').go_to(9, true) end, { des
 -- Quick buffer navigation (using j/l now instead of h/l)
 map("n", "<S-j>", "<cmd>bprevious<cr>", { desc = "Prev Buffer" })
 map("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next Buffer" })
-

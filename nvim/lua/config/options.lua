@@ -5,6 +5,10 @@
 -- Disable relative line numbers
 vim.opt.relativenumber = false
 
+if vim.env.SSH_TTY or vim.env.SSH_CONNECTION or vim.env.MOSH_CONNECTION then
+  vim.g.clipboard = "osc52"
+end
+
 -- Enable text wrapping
 vim.opt.wrap = true
 vim.opt.linebreak = true -- Break lines at word boundaries

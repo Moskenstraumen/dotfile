@@ -22,16 +22,35 @@ if [ ! -x "$(command -v git)" ]; then
 	exit 1
 fi
 
-# create symlinks of my dotfiles (will not override if already exists)
+link_managed_path() {
+	local source="$1"
+	local target="$2"
+	local backup
+
+	if [ -L "$target" ]; then
+		ln -sfn "$source" "$target"
+		return
+	fi
+
+	if [ -e "$target" ]; then
+		backup="${target}.backup.$(date +%Y%m%d%H%M%S)"
+		mv "$target" "$backup"
+		echo "Backed up existing $target to $backup"
+	fi
+
+	ln -s "$source" "$target"
+}
+
+# create symlinks of my dotfiles
 [ -d "$HOME/.config" ] || mkdir -p $HOME/.config
-[ -d "$HOME/.config/nvim" ] || ln -s $HOME/dotfile/nvim $HOME/.config/nvim
-[ -d "$HOME/.config/yazi" ] || ln -s $HOME/dotfile/yazi $HOME/.config/yazi
-[ -f "$HOME/.config/starship.toml" ] || ln -s $HOME/dotfile/starship.toml $HOME/.config/starship.toml
+link_managed_path "$HOME/dotfile/nvim" "$HOME/.config/nvim"
+link_managed_path "$HOME/dotfile/yazi" "$HOME/.config/yazi"
+link_managed_path "$HOME/dotfile/starship.toml" "$HOME/.config/starship.toml"
 [ -d "$HOME/.config/zsh" ] || mkdir -p $HOME/.config/zsh
-[ -f "$HOME/.config/zsh/zshrc" ] || ln -s $HOME/dotfile/zsh/zshrc.remote $HOME/.config/zsh/zshrc
-[ -f "$HOME/.config/zsh/alias.zsh" ] || ln -s $HOME/dotfile/zsh/alias.zsh $HOME/.config/zsh/alias.zsh
-[ -f "$HOME/.zshrc" ] || ln -s $HOME/.config/zsh/zshrc $HOME/.zshrc
-[ -f "$HOME/.tmux.conf" ] || ln -s $HOME/dotfile/tmux/tmux.conf.remote $HOME/.tmux.conf
+link_managed_path "$HOME/dotfile/zsh/zshrc.remote" "$HOME/.config/zsh/zshrc"
+link_managed_path "$HOME/dotfile/zsh/alias.zsh" "$HOME/.config/zsh/alias.zsh"
+link_managed_path "$HOME/.config/zsh/zshrc" "$HOME/.zshrc"
+link_managed_path "$HOME/dotfile/tmux/tmux.conf.remote" "$HOME/.tmux.conf"
 
 # shell and tmux plugins
 if [ ! -d "$HOME/.oh-my-zsh" ]; then

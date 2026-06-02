@@ -8,8 +8,6 @@ alias so="ssh oracle"
 alias vi=nvim
 alias vim=nvim
 alias vz="nvim ~/.zshrc"
-alias vr="nvim ./README.md"
-alias vt='vi "$(mktemp /tmp/vt.XXXXXX)"'
 
 alias src="source ~/.zshrc"
 

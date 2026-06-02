@@ -2,9 +2,7 @@
 show_hidden = true
 
 [opener]
-edit = [
-  { run = "nvim %s", desc = "nvim", block = true, for = "unix" },
-]
+edit = [{ run = "nvim %s", desc = "nvim", block = true, for = "unix" }]
 
 [open]
 prepend_rules = [

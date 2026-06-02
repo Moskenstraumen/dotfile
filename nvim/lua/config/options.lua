@@ -5,7 +5,16 @@
 -- Disable relative line numbers
 vim.opt.relativenumber = false
 
-if vim.env.SSH_TTY or vim.env.SSH_CONNECTION or vim.env.MOSH_CONNECTION then
+local has_native_clipboard = vim.fn.executable("pbcopy") == 1
+  or (vim.env.WAYLAND_DISPLAY and (vim.fn.executable("wl-copy") == 1 or vim.fn.executable("waycopy") == 1))
+  or (vim.env.DISPLAY and (vim.fn.executable("xsel") == 1 or vim.fn.executable("xclip") == 1))
+  or vim.fn.executable("lemonade") == 1
+  or vim.fn.executable("doitclient") == 1
+  or vim.fn.executable("win32yank") == 1
+  or vim.fn.executable("clip") == 1
+  or vim.fn.executable("termux-clipboard-set") == 1
+
+if not has_native_clipboard then
   vim.g.clipboard = "osc52"
 end
 

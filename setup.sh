@@ -44,7 +44,6 @@ link_managed_path() {
 # create symlinks of my dotfiles
 [ -d "$HOME/.config" ] || mkdir -p $HOME/.config
 link_managed_path "$HOME/dotfile/nvim" "$HOME/.config/nvim"
-link_managed_path "$HOME/dotfile/yazi" "$HOME/.config/yazi"
 link_managed_path "$HOME/dotfile/starship.toml" "$HOME/.config/starship.toml"
 [ -d "$HOME/.config/zsh" ] || mkdir -p $HOME/.config/zsh
 link_managed_path "$HOME/dotfile/zsh/zshrc.remote" "$HOME/.config/zsh/zshrc"
@@ -72,16 +71,6 @@ fi
 [ -x "$(command -v starship)" ] || curl -sS https://starship.rs/install.sh | sh -s -- --bin-dir $INSTALLDIR --yes
 [ -x "$(command -v rg)" ] || cargo install ripgrep
 [ -x "$(command -v fd)" ] || cargo install fd-find
-if [ ! -x "$(command -v yazi)" ] || [ ! -x "$(command -v ya)" ]; then
-	if ! cargo install --force --locked yazi-build || [ ! -x "$(command -v yazi)" ] || [ ! -x "$(command -v ya)" ]; then
-		echo "Latest yazi-build failed; falling back to yazi 26.1.22 for older Rust toolchains."
-		YAZI_CRATE_BUILD=1 VERGEN_GIT_SHA=Crates.io JEMALLOC_SYS_WITH_LG_PAGE=16 JEMALLOC_SYS_WITH_MALLOC_CONF=narenas:1 \
-			cargo install --force --locked yazi-fm yazi-cli --version 26.1.22
-	fi
-fi
-if [ -x "$(command -v ya)" ] && [ -f "$HOME/.config/yazi/package.toml" ]; then
-	ya pkg install
-fi
 if [ ! -x "$(command -v lazygit)" ]; then
 	curl -Lo lazygit.tar.gz https://github.com/jesseduffield/lazygit/releases/download/v0.45.2/lazygit_0.45.2_$(uname -s)_$(uname -m).tar.gz
 	mkdir lazygit

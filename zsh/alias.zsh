@@ -1,7 +1,6 @@
 unalias proxy_on proxy_off 2>/dev/null || true
 
-alias ss="ssh 54.27"
-alias sd="ssh 54.48"
+alias ss="ssh stepmind"
 alias so="ssh oracle"
 
 alias vi=nvim

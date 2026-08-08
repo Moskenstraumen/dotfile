@@ -76,7 +76,7 @@ set -sg repeat-time 10
 set-option -g set-titles on
 set-option -g set-titles-string "#S"
 
-# yazi/zsh support
+# Terminal passthrough and clipboard support
 set -g allow-passthrough on
 set -g set-clipboard on
 set -ga update-environment TERM
@@ -120,14 +120,20 @@ bind w choose-tree -wZ
 # ╰──────────────────────────────────────────────────────────╯
 
 # vim-tmux-navigator integration
-# Smart navigation that detects whether you're in nvim or tmux
-is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
+# Smart navigation that detects whether you're in nvim or tmux.
+# Remote nvim sets pane_title to nvim:<keys>; only pass through directions
+# that still have an nvim window to move to, otherwise move tmux panes.
+is_local_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
+is_remote_nav_j="printf '%s' '#{pane_current_command}' | grep -iqE '^(ssh|mosh|mosh-client)$' && printf '%s' '#{pane_title}' | grep -iqE '^nvim:[^ ]*j'"
+is_remote_nav_k="printf '%s' '#{pane_current_command}' | grep -iqE '^(ssh|mosh|mosh-client)$' && printf '%s' '#{pane_title}' | grep -iqE '^nvim:[^ ]*k'"
+is_remote_nav_i="printf '%s' '#{pane_current_command}' | grep -iqE '^(ssh|mosh|mosh-client)$' && printf '%s' '#{pane_title}' | grep -iqE '^nvim:[^ ]*i'"
+is_remote_nav_l="printf '%s' '#{pane_current_command}' | grep -iqE '^(ssh|mosh|mosh-client)$' && printf '%s' '#{pane_title}' | grep -iqE '^nvim:[^ ]*l'"
 
 # Prefix-less navigation (C-ijkl)
-bind-key -n 'C-j' if-shell "$is_vim" 'send-keys C-j' 'select-pane -L'
-bind-key -n 'C-k' if-shell "$is_vim" 'send-keys C-k' 'select-pane -D'
-bind-key -n 'C-i' if-shell "$is_vim" 'send-keys C-i' 'select-pane -U'
-bind-key -n 'C-l' if-shell "$is_vim" 'send-keys C-l' 'select-pane -R'
+bind-key -n 'C-j' if-shell "$is_local_vim || { $is_remote_nav_j; }" 'send-keys C-j' 'select-pane -L'
+bind-key -n 'C-k' if-shell "$is_local_vim || { $is_remote_nav_k; }" 'send-keys C-k' 'select-pane -D'
+bind-key -n 'C-i' if-shell "$is_local_vim || { $is_remote_nav_i; }" 'send-keys C-i' 'select-pane -U'
+bind-key -n 'C-l' if-shell "$is_local_vim || { $is_remote_nav_l; }" 'send-keys C-l' 'select-pane -R'
 
 bind-key -T copy-mode-vi 'C-j' select-pane -L
 bind-key -T copy-mode-vi 'C-k' select-pane -D

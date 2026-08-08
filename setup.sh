@@ -41,6 +41,26 @@ link_managed_path() {
 	ln -s "$source" "$target"
 }
 
+github_latest_asset_url() {
+	local repo="$1"
+	local pattern="$2"
+	local url
+
+	url="$(
+		curl -fsSL "https://api.github.com/repos/$repo/releases/latest" |
+			sed -n 's/.*"browser_download_url": "\(.*\)".*/\1/p' |
+			grep -E "$pattern" |
+			head -n 1
+	)"
+
+	if [ -z "$url" ]; then
+		echo "Could not find latest GitHub release asset for $repo matching $pattern" >&2
+		return 1
+	fi
+
+	printf '%s\n' "$url"
+}
+
 # create symlinks of my dotfiles
 [ -d "$HOME/.config" ] || mkdir -p $HOME/.config
 link_managed_path "$HOME/dotfile/nvim" "$HOME/.config/nvim"
@@ -72,7 +92,14 @@ fi
 [ -x "$(command -v rg)" ] || cargo install ripgrep
 [ -x "$(command -v fd)" ] || cargo install fd-find
 if [ ! -x "$(command -v lazygit)" ]; then
-	curl -Lo lazygit.tar.gz https://github.com/jesseduffield/lazygit/releases/download/v0.45.2/lazygit_0.45.2_$(uname -s)_$(uname -m).tar.gz
+	lazygit_os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+	lazygit_arch="$(uname -m)"
+	case "$lazygit_arch" in
+		amd64) lazygit_arch="x86_64" ;;
+		aarch64) lazygit_arch="arm64" ;;
+	esac
+	lazygit_url="$(github_latest_asset_url jesseduffield/lazygit "lazygit_[^/]+_${lazygit_os}_${lazygit_arch}\\.tar\\.gz$")" || exit 1
+	curl -fLo lazygit.tar.gz "$lazygit_url"
 	mkdir lazygit
 	tar -xvf lazygit.tar.gz -C lazygit
 	mv lazygit/lazygit $INSTALLDIR
@@ -102,17 +129,23 @@ if [ -z "$tmux_version" ]; then
 	tmux_version="0.0"
 fi
 if [ "$(printf '%s\n' "$tmux_version" "3.3" | sort -V | head -n1)" = "$tmux_version" ] && [ "$tmux_version" != "3.3" ]; then
-	curl -Lo tmux-3.5a.tar.gz https://github.com/tmux/tmux/releases/download/3.5a/tmux-3.5a.tar.gz
-	tar -xvzf tmux-3.5a.tar.gz
-	cd tmux-3.5a
+	tmux_url="$(github_latest_asset_url tmux/tmux 'tmux-[^/]+\.tar\.gz$')" || exit 1
+	tmux_archive="$(basename "$tmux_url")"
+	curl -fLo "$tmux_archive" "$tmux_url"
+	tmux_dir="$(tar -tzf "$tmux_archive" | head -n 1 | cut -d/ -f1)"
+	tar -xvzf "$tmux_archive"
+	cd "$tmux_dir"
 	if pkg-config --cflags --libs libevent &>/dev/null; then
 		./configure --prefix=$HOME/.local && make -j$(nproc)
 	elif PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/.local/lib/pkgconfig pkg-config --cflags --libs libevent &>/dev/null; then
 		./configure --prefix=$HOME/.local CFLAGS="-I$HOME/.local/include" LDFLAGS="-L$HOME/.local/lib" && make -j$(nproc)
 	else
-		curl -Lo libevent.tar.gz https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz
-		tar -xvzf libevent.tar.gz
-		cd libevent
+		libevent_url="$(github_latest_asset_url libevent/libevent 'libevent-[^/]+\.tar\.gz$')" || exit 1
+		libevent_archive="$(basename "$libevent_url")"
+		curl -fLo "$libevent_archive" "$libevent_url"
+		libevent_dir="$(tar -tzf "$libevent_archive" | head -n 1 | cut -d/ -f1)"
+		tar -xvzf "$libevent_archive"
+		cd "$libevent_dir"
 		mkdir build && cd build
 		cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/.local
 		make -j$(nproc)
@@ -122,7 +155,7 @@ if [ "$(printf '%s\n' "$tmux_version" "3.3" | sort -V | head -n1)" = "$tmux_vers
 	fi
 	make install
 	cd ..
-	rm -rf tmux-3.5a tmux-3.5a.tar.gz
+	rm -rf "$tmux_dir" "$tmux_archive"
 	echo "$(tmux -V) has been installed!"
 fi
 # tmux seems to be superior than xclip in terms of syncing up clipboards

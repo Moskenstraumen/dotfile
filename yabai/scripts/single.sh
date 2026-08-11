@@ -1,20 +1,22 @@
 #!/usr/bin/env bash
 source "$HOME/.config/yabai/scripts/utils.sh"
 
-# 1. ENSURE WE HAVE AT LEAST 3 SPACES
-ensure_minimum_spaces 4
+# 1. ENSURE WE HAVE AT LEAST 5 SPACES
+ensure_minimum_spaces 5
 
 # 2. GET THE ACTUAL SPACE INDEXES
 SPACE1=$(get_space_index 1)
 SPACE2=$(get_space_index 2)
 SPACE3=$(get_space_index 3)
 SPACE4=$(get_space_index 4)
+SPACE5=$(get_space_index 5)
 
 # 3. LABEL THE SPACES (all on built-in display already)
 yabai -m space "$SPACE1" --label "work" --layout stack
 yabai -m space "$SPACE2" --label "brow" --layout stack
-yabai -m space "$SPACE3" --label "edit"
-yabai -m space "$SPACE4" --label "chat" --layout stack
+yabai -m space "$SPACE3" --label "paper" --layout stack
+yabai -m space "$SPACE4" --label "note" --layout stack
+yabai -m space "$SPACE5" --label "chat" --layout stack
 
 # 4. DISABLE GAPPING FOR MOBILE MODE
 yabai -m config top_padding 0
@@ -25,15 +27,14 @@ yabai -m config window_gap 0
 
 # 5. DEFINE RULES (Mobile Layout)
 # Use labels instead of hardcoded indexes
-yabai -m rule --add app="^Codex$" space=work
+yabai -m rule --add app="^ChatGPT$" space=work
 # Keep regular kitty windows on work; the scratchpad stays global and floating
 yabai -m rule --add app="^kitty$" title!="^kitty-scratchpad$" space=work
 yabai -m rule --add app="^Google Chrome$" space=brow
-yabai -m rule --add app="^Zotero$" space=brow
-yabai -m rule --add app="^Code$" space=edit
-yabai -m rule --add app="^Microsoft Word$" space=edit
+yabai -m rule --add app="^Zotero$" space=paper
+yabai -m rule --add app="^Microsoft Word$" space=note
+yabai -m rule --add app="^Obsidian$" space=note
 yabai -m rule --add app="^Feishu$" space=chat
-yabai -m rule --add app="^Obsidian$" space=chat
 yabai -m rule --add app="^WeChat$" space=chat
 
 # 6. APPLY RULES

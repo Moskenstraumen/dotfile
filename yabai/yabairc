@@ -43,7 +43,6 @@ yabai -m config bottom_padding 2
 yabai -m config left_padding 2
 yabai -m config right_padding 2
 yabai -m config window_gap 2
-
 ###########################################
 
 # Detect display count and run appropriate script when display is removed
@@ -70,8 +69,6 @@ yabai -m rule --add app="^Finder$" manage=off
 yabai -m rule --add app="^Terminal$" manage=off
 yabai -m rule --add app="^(Notes|Reminders)$" manage=off
 # User
-yabai -m rule --add app="^aTrust$" manage=off
-yabai -m rule --add app="^Clash Verge$" manage=off
 yabai -m rule --add app="^WeChat$" manage=off
 yabai -m rule --add app="^Spotify$" manage=off
 yabai -m rule --add app="^Tailscale$" manage=off

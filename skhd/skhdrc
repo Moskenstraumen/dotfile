@@ -103,7 +103,7 @@ alt - 0x32      : yabai -m window --focus stack.next || yabai -m window --focus 
 alt - e         : open ~/
 
 # Kitty
-alt - return    : "${HOME}"/.config/yabai/open_kitty.sh
+hyper - return  : "${HOME}"/.config/yabai/open_kitty.sh
 
 ###########################################
 

@@ -33,8 +33,7 @@ yabai -m display --focus $MAIN 2>/dev/null || true
 # 6. DEFINE RULES
 # Use labels instead of hardcoded indexes since indexes may vary
 yabai -m rule --add app="^Codex$" space=work
-yabai -m rule --add app="^kitty$" space=work
-# Default: any other kitty window goes to term
+yabai -m rule --add app="^kitty$" title!="^kitty-scratchpad$" space=work
 yabai -m rule --add app="^Google Chrome$" space=brow
 yabai -m rule --add app="^Zotero$" space=brow
 yabai -m rule --add app="^Code$" space=edit

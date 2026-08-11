@@ -76,6 +76,14 @@ yabai -m rule --add app="^WeChat$" manage=off
 yabai -m rule --add app="^Spotify$" manage=off
 yabai -m rule --add app="^Tailscale$" manage=off
 
+# Kitty scratchpad
+yabai -m rule --add \
+  label="kitty-scratchpad-rule" \
+  app="^kitty$" \
+  title="^kitty-scratchpad$" \
+  scratchpad="kitty-drop" \
+  grid="24:38:2:2:34:20"
+
 # Initial setup based on current display count
 # Use bash to run script in background with delay to ensure yabai is ready
 (

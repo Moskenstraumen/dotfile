@@ -40,7 +40,7 @@ yabai -m display --focus $MAIN 2>/dev/null || true
 # 6. DEFINE RULES (Desk Layout)
 # Use labels instead of hardcoded indexes since indexes may vary
 yabai -m rule --add app="^Codex$" space=work
-# Default: any other kitty window goes to term
+yabai -m rule --add app="^kitty$" title!="^kitty-scratchpad$" space=work
 yabai -m rule --add app="^Google Chrome$" space=brow
 yabai -m rule --add app="^Zotero$" space=read
 yabai -m rule --add app="^Microsoft Word$" space=read

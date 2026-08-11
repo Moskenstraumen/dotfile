@@ -26,8 +26,8 @@ yabai -m config window_gap 0
 # 5. DEFINE RULES (Mobile Layout)
 # Use labels instead of hardcoded indexes
 yabai -m rule --add app="^Codex$" space=work
-# All kitty windows on term space for easy access in single monitor
-yabai -m rule --add app="^kitty$" space=work
+# Keep regular kitty windows on work; the scratchpad stays global and floating
+yabai -m rule --add app="^kitty$" title!="^kitty-scratchpad$" space=work
 yabai -m rule --add app="^Google Chrome$" space=brow
 yabai -m rule --add app="^Zotero$" space=brow
 yabai -m rule --add app="^Code$" space=edit

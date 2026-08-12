@@ -46,10 +46,10 @@ yabai -m config window_gap 2
 ###########################################
 
 # Detect display count and run appropriate script when display is removed
-yabai -m signal --add event=display_removed action='COUNT=$(yabai -m query --displays | jq "length"); if [ "$COUNT" -eq 1 ]; then bash "$HOME/.config/yabai/scripts/single.sh"; elif [ "$COUNT" -eq 2 ]; then bash "$HOME/.config/yabai/scripts/double.sh"; fi'
+yabai -m signal --add event=display_removed action='COUNT=$(yabai -m query --displays | jq "length"); if [ "$COUNT" -eq 1 ]; then bash "$HOME/.config/yabai/scripts/single.sh" --display-removed; elif [ "$COUNT" -eq 2 ]; then bash "$HOME/.config/yabai/scripts/double.sh"; fi'
 
 # Detect display count and run appropriate script when display is added
-yabai -m signal --add event=display_added action='COUNT=$(yabai -m query --displays | jq "length"); if [ "$COUNT" -eq 2 ]; then bash "$HOME/.config/yabai/scripts/double.sh"; elif [ "$COUNT" -eq 3 ]; then bash "$HOME/.config/yabai/scripts/triple.sh"; fi'
+yabai -m signal --add event=display_added action='COUNT=$(yabai -m query --displays | jq "length"); if [ "$COUNT" -eq 2 ]; then bash "$HOME/.config/yabai/scripts/double.sh"; fi'
 
 # SketchyBar event signals
 yabai -m signal --add event=window_focused action="sketchybar --trigger yabai_window_focus"
@@ -91,8 +91,6 @@ yabai -m rule --add \
     bash "$HOME/.config/yabai/scripts/single.sh"
   elif [ "$display_count" -eq 2 ]; then
     bash "$HOME/.config/yabai/scripts/double.sh"
-  else
-    bash "$HOME/.config/yabai/scripts/triple.sh"
   fi
 ) &
 

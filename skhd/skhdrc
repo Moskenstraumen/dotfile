@@ -71,6 +71,7 @@ hyper - 5       : yabai -m space --focus 5
 # Focus space
 hyper - w       : yabai -m space --focus work
 hyper - b       : yabai -m space --focus brow
+hyper - e       : yabai -m space --focus edit
 hyper - p       : yabai -m space --focus paper
 hyper - n       : yabai -m space --focus note
 hyper - c       : yabai -m space --focus chat
@@ -107,9 +108,8 @@ hyper - return  : "${HOME}"/.config/yabai/open_kitty.sh
 
 ###########################################
 
-# Manual single/triple layout fallback
+# Manual single-display layout fallback
 ctrl + alt - s  : ~/.config/yabai/scripts/single.sh
-ctrl + alt - t  : ~/.config/yabai/scripts/triple.sh
 
 ###########################################
 

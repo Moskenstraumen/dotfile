@@ -1,6 +1,38 @@
 #!/usr/bin/env bash
 source "$HOME/.config/yabai/scripts/utils.sh"
 
+# When the external display is disconnected, close VS Code and remove the
+# double-display-only edit space before applying the single-display layout.
+if [ "${1:-}" = "--display-removed" ]; then
+  /usr/bin/osascript \
+    -e 'set vscodeApp to "Code"' \
+    -e 'if application vscodeApp is running then' \
+    -e 'tell application vscodeApp to quit' \
+    -e 'end if' \
+    >/dev/null 2>&1 || true
+
+  EDIT_SPACE=$(yabai -m query --spaces | jq -r \
+    'map(select(.label == "edit"))[0].index // empty')
+
+  if [ -n "$EDIT_SPACE" ]; then
+    WORK_SPACE=$(yabai -m query --spaces | jq -r \
+      'map(select(.label == "work"))[0].index // empty')
+
+    if [ -z "$WORK_SPACE" ] || [ "$WORK_SPACE" = "$EDIT_SPACE" ]; then
+      echo "Could not find a safe destination for windows in edit." >&2
+      exit 1
+    fi
+
+    yabai -m space --focus "$WORK_SPACE" 2>/dev/null || true
+
+    # Stop if edit cannot be removed so ensure_minimum_spaces does not delete paper.
+    if ! yabai -m space --destroy "$EDIT_SPACE" 2>/dev/null; then
+      echo "Could not remove edit space; single-display layout was not applied." >&2
+      exit 1
+    fi
+  fi
+fi
+
 # 1. ENSURE WE HAVE AT LEAST 5 SPACES
 ensure_minimum_spaces 5
 

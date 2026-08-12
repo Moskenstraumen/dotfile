@@ -107,9 +107,8 @@ hyper - return  : "${HOME}"/.config/yabai/open_kitty.sh
 
 ###########################################
 
-# Force run the scripts if automation fails
+# Manual single/triple layout fallback
 ctrl + alt - s  : ~/.config/yabai/scripts/single.sh
-ctrl + alt - d  : ~/.config/yabai/scripts/double.sh
 ctrl + alt - t  : ~/.config/yabai/scripts/triple.sh
 
 ###########################################

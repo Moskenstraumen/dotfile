@@ -21,15 +21,15 @@ SPACE6=$(get_space_index 6)
 yabai -m space "$SPACE1" --display "$MAIN" 2>/dev/null || true
 yabai -m space "$SPACE2" --display "$MAIN" 2>/dev/null || true
 yabai -m space "$SPACE3" --display "$MAIN" 2>/dev/null || true
-yabai -m space "$SPACE4" --display "$MAIN" 2>/dev/null || true
+yabai -m space "$SPACE4" --display "$EXTEND" 2>/dev/null || true
 yabai -m space "$SPACE5" --display "$EXTEND" 2>/dev/null || true
 yabai -m space "$SPACE6" --display "$EXTEND" 2>/dev/null || true
 
 # 4. LABEL SPACES AND SET LAYOUT
 yabai -m space "$SPACE1" --label "work" --layout stack
-yabai -m space "$SPACE2" --label "brow" --layout stack
-yabai -m space "$SPACE3" --label "note" --layout stack
-yabai -m space "$SPACE4" --label "chat" --layout stack
+yabai -m space "$SPACE2" --label "note" --layout stack
+yabai -m space "$SPACE3" --label "chat" --layout stack
+yabai -m space "$SPACE4" --label "brow" --layout stack
 yabai -m space "$SPACE5" --label "edit" --layout stack
 yabai -m space "$SPACE6" --label "paper" --layout stack
 
@@ -39,14 +39,13 @@ yabai -m display --focus "$MAIN" 2>/dev/null || true
 # 6. DEFINE RULES
 # Use labels instead of hardcoded indexes since indexes may vary
 yabai -m rule --add app="^ChatGPT$" space=work
-yabai -m rule --add app="^kitty$" title!="^kitty-scratchpad$" space=work
-yabai -m rule --add app="^Google Chrome$" space=brow
-yabai -m rule --add app="^Code$" space=edit
-yabai -m rule --add app="^Zotero$" space=paper
 yabai -m rule --add app="^Microsoft Word$" space=note
 yabai -m rule --add app="^Obsidian$" space=note
 yabai -m rule --add app="^Feishu$" space=chat
 yabai -m rule --add app="^WeChat$" space=chat
+yabai -m rule --add app="^Google Chrome$" space=brow
+yabai -m rule --add app="^Code$" space=edit
+yabai -m rule --add app="^Zotero$" space=paper
 
 # 7. APPLY RULES
 yabai -m rule --apply

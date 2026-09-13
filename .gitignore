@@ -24,7 +24,6 @@ lazygit/*
 lazygit/config.yml
 leetcode-cookie
 misc/
-nvim/pack/
 vifm/vifminfo.json
 vifm/vifm-help.txt
 zsh/.zsh_sessions/
@@ -39,4 +38,6 @@ karabiner/automatic_backups/*
 .claude/
 ccstatusline/
 sketchybar_backup/
-tmux-client-*.log
+zed/prompts/
+zed/snippets/
+zed/*.before-*

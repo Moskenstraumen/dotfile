@@ -17,7 +17,7 @@ if [ ! -x "$(command -v curl)" ]; then
 	exit 1
 fi
 if [ ! -x "$(command -v git)" ]; then
-	echo "git is required for pulling shell and tmux plugins"
+	 echo "git is required for pulling shell plugins"
 	echo "Exiting..."
 	exit 1
 fi
@@ -63,13 +63,11 @@ github_latest_asset_url() {
 
 # create symlinks of my dotfiles
 [ -d "$HOME/.config" ] || mkdir -p $HOME/.config
-link_managed_path "$HOME/dotfile/nvim" "$HOME/.config/nvim"
 link_managed_path "$HOME/dotfile/starship.toml" "$HOME/.config/starship.toml"
 [ -d "$HOME/.config/zsh" ] || mkdir -p $HOME/.config/zsh
 link_managed_path "$HOME/dotfile/zsh/zshrc.remote" "$HOME/.config/zsh/zshrc"
 link_managed_path "$HOME/dotfile/zsh/alias.zsh" "$HOME/.config/zsh/alias.zsh"
 link_managed_path "$HOME/.config/zsh/zshrc" "$HOME/.zshrc"
-link_managed_path "$HOME/dotfile/tmux/tmux.conf.remote" "$HOME/.tmux.conf"
 
 # shell and tmux plugins
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
@@ -78,7 +76,6 @@ fi
 ZSH_CUSTOM=${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}
 [ -d "$ZSH_CUSTOM/plugins/zsh-autosuggestions" ] || git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
 [ -d "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting" ] || git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
-[ -d "$HOME/.tmux/plugins/tpm" ] || git clone --depth=1 https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
 
 # installations of all the tools I need
 [ -x "$(command -v cargo)" ] || curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -106,59 +103,6 @@ if [ ! -x "$(command -v lazygit)" ]; then
 	rm -r lazygit lazygit.tar.gz
 fi
 
-# install neovim which is compiled for older systems
-# if your system is relatively new, you can install it from:
-# https://github.com/neovim/neovim/releases/tag/stable
-if [ ! -x "$(command -v nvim)" ] || [ ! -d "$HOME/.local/share/nvim/runtime" ]; then
-	curl -Lo nvim.tar.gz https://github.com/neovim/neovim-releases/releases/download/stable/nvim-linux-x86_64.tar.gz
-	tar -xzf nvim.tar.gz
-	cd nvim-linux-x86_64
-	/bin/cp -rf bin/* $INSTALLDIR/
-	/bin/cp -rf share/* $INSTALLDIR/../share
-	/bin/cp -rf lib/* $INSTALLDIR/../lib
-	cd ..
-	rm -rf nvim-linux-x86_64 nvim.tar.gz
-fi
-
-# install tmux>=3.3 for allow-passthrough option
-tmux_version=$(tmux -V 2>/dev/null | awk '{print $2}')
-if [[ ! ${tmux_version: -1} =~ [0-9] ]]; then
-	tmux_version="${tmux_version::-1}"
-fi
-if [ -z "$tmux_version" ]; then
-	tmux_version="0.0"
-fi
-if [ "$(printf '%s\n' "$tmux_version" "3.3" | sort -V | head -n1)" = "$tmux_version" ] && [ "$tmux_version" != "3.3" ]; then
-	tmux_url="$(github_latest_asset_url tmux/tmux 'tmux-[^/]+\.tar\.gz$')" || exit 1
-	tmux_archive="$(basename "$tmux_url")"
-	curl -fLo "$tmux_archive" "$tmux_url"
-	tmux_dir="$(tar -tzf "$tmux_archive" | head -n 1 | cut -d/ -f1)"
-	tar -xvzf "$tmux_archive"
-	cd "$tmux_dir"
-	if pkg-config --cflags --libs libevent &>/dev/null; then
-		./configure --prefix=$HOME/.local && make -j$(nproc)
-	elif PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$HOME/.local/lib/pkgconfig pkg-config --cflags --libs libevent &>/dev/null; then
-		./configure --prefix=$HOME/.local CFLAGS="-I$HOME/.local/include" LDFLAGS="-L$HOME/.local/lib" && make -j$(nproc)
-	else
-		libevent_url="$(github_latest_asset_url libevent/libevent 'libevent-[^/]+\.tar\.gz$')" || exit 1
-		libevent_archive="$(basename "$libevent_url")"
-		curl -fLo "$libevent_archive" "$libevent_url"
-		libevent_dir="$(tar -tzf "$libevent_archive" | head -n 1 | cut -d/ -f1)"
-		tar -xvzf "$libevent_archive"
-		cd "$libevent_dir"
-		mkdir build && cd build
-		cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/.local
-		make -j$(nproc)
-		make install
-		cd ../..
-		./configure --prefix=$HOME/.local CFLAGS="-I$HOME/.local/include" LDFLAGS="-L$HOME/.local/lib" && make -j$(nproc)
-	fi
-	make install
-	cd ..
-	rm -rf "$tmux_dir" "$tmux_archive"
-	echo "$(tmux -V) has been installed!"
-fi
-# tmux seems to be superior than xclip in terms of syncing up clipboards
 # # install xclip
 # if [ ! -x "$(command -v xclip)" ]; then
 # 	wget https://sourceforge.net/projects/xclip/files/latest/download -O xclip.tar.gz

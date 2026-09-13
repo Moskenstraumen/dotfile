@@ -3,17 +3,11 @@ unalias proxy_on proxy_off 2>/dev/null || true
 alias ss="ssh stepmind"
 alias so="ssh oracle"
 
-alias vi=nvim
-alias vim=nvim
-alias vz="nvim ~/.zshrc"
+alias vi="otty edit"
 
 alias src="source ~/.zshrc"
 
-alias vk='nvim ~/.config/kitty/kitty.conf'
-alias vs="nvim ~/.config/starship.toml"
-
-alias show='kitty +kitten icat'
-alias kdiff='kitty +kitten diff'
+alias vs="otty edit ~/.config/starship.toml"
 
 proxy_on() {
   export http_proxy="http://127.0.0.1:7890"

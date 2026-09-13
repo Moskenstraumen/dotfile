@@ -103,9 +103,6 @@ alt - 0x32      : yabai -m window --focus stack.next || yabai -m window --focus 
 # Finder
 alt - e         : open ~/
 
-# Kitty
-hyper - return  : "${HOME}"/.config/yabai/open_kitty.sh
-
 ###########################################
 
 # Manual single-display layout fallback

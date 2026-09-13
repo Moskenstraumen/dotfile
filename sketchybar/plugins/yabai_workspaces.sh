@@ -5,20 +5,23 @@ app_icon() {
     # Browsers
     Safari)                          echo "󰀹" ;;
     Firefox | "Firefox Developer Edition") echo "󰈹" ;;
-    "Google Chrome")                 echo "󰊯" ;;
+    "Google Chrome")                 echo "" ;;
+    ChatGPT)                          echo "" ;;
     Brave*)                          echo "󰖟" ;;
     "Microsoft Edge")                echo "󰇩" ;;
 
     # Terminals
-    Terminal)                        echo "󰆍" ;;
+    Terminal)                        echo "" ;;
     iTerm2)                          echo "󰆍" ;;
     Ghostty)                         echo "󰊠" ;;
-    kitty)                           echo "󰄛" ;;
     Alacritty)                       echo "󰆍" ;;
     WezTerm)                         echo "󰆍" ;;
+    kitty)                            echo "" ;;
 
     # Editors / IDE
     Code | "Visual Studio Code" | "Visual Studio Code - Insiders") echo "󰨞" ;;
+    Cursor)                          echo "󰨞" ;;
+    Zed)                             echo "" ;;
     IntelliJ* | PyCharm* | WebStorm*) echo "󰬷" ;;
     "Sublime Text")                  echo "󰅳" ;;
     Xcode)                           echo "󰘧" ;;
@@ -32,7 +35,7 @@ app_icon() {
     Messages)                        echo "󰍦" ;;
     Mail)                            echo "󰇮" ;;
     WeChat)                          echo "󰘑" ;;
-    Feishu)                          echo "󰭹" ;;
+    Feishu|Lark)                     echo "" ;;
 
     # Music / media
     Spotify)                         echo "󰓇" ;;
@@ -50,11 +53,11 @@ app_icon() {
 
     # Productivity
     Notion)                          echo "󰎞" ;;
-    Obsidian)                        echo "󰇈" ;;
+    Obsidian)                        echo "" ;;
     Todoist)                         echo "󰄲" ;;
 
     # Research / Reference
-    Zotero)                          echo "󱉟" ;;
+    Zotero)                          echo "" ;;
 
     # Dev tools
     Postman)                         echo "󰳮" ;;
@@ -62,6 +65,13 @@ app_icon() {
     "GitHub Desktop")                echo "󰊤" ;;
 
     *)                               echo "󰘔" ;;
+  esac
+}
+
+app_font() {
+  case "$1" in
+    "Google Chrome"|ChatGPT|Zed|Zotero|Obsidian|Terminal|Feishu|Lark|kitty) echo "sketchybar-app-font:Regular:13.0" ;;
+    *) echo "Maple Mono NF CN:Medium:13.0" ;;
   esac
 }
 
@@ -81,11 +91,13 @@ for (( i=0; i<space_count; i++ )); do
 
   # Get only the topmost (first) window's app icon for this space
   icon=""
+  font="Maple Mono NF CN:Medium:13.0"
   if [ "$first_wid" != "0" ] && [ "$first_wid" != "null" ]; then
     top_app=$(printf '%s\n' "$WINDOWS" \
       | jq -r --argjson wid "$first_wid" '.[] | select(.id == $wid) | .app' 2>/dev/null)
     if [ -n "$top_app" ]; then
       icon=$(app_icon "$top_app")
+      font=$(app_font "$top_app")
     fi
   fi
 
@@ -98,13 +110,18 @@ for (( i=0; i<space_count; i++ )); do
   if [ -n "$icon" ]; then
     sketchybar --set "yabai_space.$sid" \
       "${args[@]}" \
+      background.image.drawing=off \
+      image.drawing=off \
       label="$icon" \
+      label.font="$font" \
       label.drawing=on \
       label.padding_left=0 \
       label.padding_right=10
   else
     sketchybar --set "yabai_space.$sid" \
       "${args[@]}" \
+      background.image.drawing=off \
+      image.drawing=off \
       label.drawing=off
   fi
 done

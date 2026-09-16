@@ -229,10 +229,10 @@ install_nvm() {
 	# shellcheck source=/dev/null
 	. "$NVM_DIR/nvm.sh"
 
-	# Carry npm globals across when stepping to a newer patch of the same
-	# major; the flag fails when there is no current node to copy from.
-	if nvm install "$version" --reinstall-packages-from=current >/dev/null 2>&1 ||
-		nvm install "$version" >/dev/null 2>&1; then
+	# Deliberately no --reinstall-packages-from: globals are declared in the
+	# Brewfile's npm entries, so a new node starts clean and brew bundle puts
+	# back exactly what is meant to be there, not whatever accumulated.
+	if nvm install "$version" >/dev/null 2>&1; then
 		nvm alias default "$version" >/dev/null 2>&1 || true
 		log "node $(node --version 2>/dev/null) (pinned to $version) via nvm $tag"
 	else

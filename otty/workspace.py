@@ -30,9 +30,16 @@ FILES = "files"  # a file-browser tab at ~ (matches any file tab in the group)
 SHELL = "shell"  # a local terminal tab (matches any terminal tab in the group)
 
 ALI_SHELL = f"ssh -t {KEEPALIVE} ali 'cd {ALI_DIR} && exec bash'"
-# `bash -ic` loads ~/.bashrc so ~/.local/bin (claude) is on PATH; `exec bash` keeps
-# the tab usable after claude exits.
-ALI_CLAUDE = f"ssh -t {KEEPALIVE} ali 'cd {ALI_DIR} && bash -ic claude; exec bash'"
+# `bash -ic` loads ~/.bashrc so ~/.local/bin (claude) is on PATH. The fallback shell
+# has to be exec'd *inside* that same interactive shell: as a sibling command
+# (`bash -ic claude; exec bash`) the tab dropped out of ssh back to this Mac when
+# claude exited. IGNOREEOF is inherited by the fallback shell so a stray Ctrl-D —
+# e.g. one more than claude consumed on its way out — no longer closes the ssh
+# session; `exit` still does.
+ALI_CLAUDE = (
+    f"ssh -t {KEEPALIVE} ali "
+    f"""'cd {ALI_DIR} && exec env IGNOREEOF=3 bash -ic "claude; exec bash -i"'"""
+)
 
 # Divider name → the tabs that group should hold, in order. Remote tabs beyond the
 # list reuse its last command when reconnecting.

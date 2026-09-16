@@ -65,9 +65,23 @@ Only the `http(s)_proxy` variables are toggled.
 
 ## Tools
 
-The remote profile installs prebuilt release binaries into `~/.local/bin`
-(starship, ripgrep, fd, lazygit), preferring static musl builds because remote
-glibc is often older than release binaries expect. Each install compares the
+The remote profile installs oh-my-zsh plus the autosuggestions and
+syntax-highlighting plugins, and these prebuilt release binaries into
+`~/.local/bin`:
+
+| | |
+|---|---|
+| starship | prompt |
+| ripgrep (`rg`) | content search |
+| fd | filename search |
+| lazygit | git TUI |
+
+It does **not** install zsh itself — no root, no package manager — and warns
+instead of failing when zsh is missing. There is no editor either; `vi` is
+aliased to whatever system vim is present.
+
+Static musl builds are preferred because remote glibc is often older than
+release binaries expect. Each install compares the
 published version against what is on `PATH` and reinstalls when it is behind, so
 re-running the script actually updates rather than skipping.
 
@@ -78,6 +92,28 @@ failing.
 The local profile installs everything through `brew bundle` from
 `bootstrap/Brewfile`; refresh it with `brew bundle dump --force --file
 bootstrap/Brewfile`.
+
+## Login shell
+
+`chsh` needs zsh listed in `/etc/shells` and is refused outright on most
+LDAP-managed cluster accounts, so the remote profile appends a guarded
+hand-off to `~/.bash_profile` (or `~/.bash_login`, or `~/.profile` — whichever
+bash would actually read) instead:
+
+```sh
+case $- in
+	*i*)
+		if [ -z "${ZSH_VERSION:-}" ] && [ -t 1 ] && command -v zsh >/dev/null 2>&1; then
+			export SHELL="$(command -v zsh)"
+			exec zsh -l
+		fi
+		;;
+esac
+```
+
+The `$-` and `-t 1` guards mean it only fires for a real interactive login, so
+`scp`, `rsync` and `ssh host cmd` keep working. It is fenced with markers and
+only appended once.
 
 ## Secrets
 

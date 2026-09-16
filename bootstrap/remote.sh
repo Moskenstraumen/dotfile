@@ -12,6 +12,16 @@ set -euo pipefail
 
 require curl git tar
 
+# zsh is not installable without root, so its absence is a warning rather
+# than a failure: the binaries below are still worth having.
+if have zsh; then
+	HAVE_ZSH=1
+else
+	HAVE_ZSH=0
+	warn "zsh is not installed and this profile cannot install it without root"
+	warn "the linked config will sit unused until zsh is available"
+fi
+
 os="$(platform_os)"
 arch="$(platform_arch)"
 
@@ -75,6 +85,46 @@ install_release_binary jesseduffield/lazygit lazygit \
 if [ "${#failed[@]}" -gt 0 ]; then
 	warn "could not install: ${failed[*]}"
 	warn "re-run after setting GITHUB_TOKEN if this was an API rate limit"
+fi
+
+# chsh needs zsh listed in /etc/shells and is refused outright on most
+# LDAP-managed cluster accounts, so hand off from the bash startup file
+# instead. The guard skips non-interactive shells, which is what keeps
+# scp, rsync and `ssh host cmd` working.
+prefer_zsh_at_login() {
+	local target marker block
+
+	if [ -f "$HOME/.bash_profile" ]; then
+		target="$HOME/.bash_profile"
+	elif [ -f "$HOME/.bash_login" ]; then
+		target="$HOME/.bash_login"
+	else
+		target="$HOME/.profile"
+	fi
+
+	marker="# >>> dotfiles: prefer zsh >>>"
+	if [ -f "$target" ] && grep -Fq "$marker" "$target"; then
+		log "login shell already hands off to zsh via $(basename "$target")"
+		return
+	fi
+
+	block="$marker
+case \$- in
+	*i*)
+		if [ -z \"\${ZSH_VERSION:-}\" ] && [ -t 1 ] && command -v zsh >/dev/null 2>&1; then
+			export SHELL=\"\$(command -v zsh)\"
+			exec zsh -l
+		fi
+		;;
+esac
+# <<< dotfiles: prefer zsh <<<"
+
+	printf '\n%s\n' "$block" >> "$target"
+	log "added a zsh hand-off to $(basename "$target")"
+}
+
+if [ "$HAVE_ZSH" -eq 1 ]; then
+	prefer_zsh_at_login
 fi
 
 if [ ! -f "$HOME/.config/zsh/secrets.zsh" ]; then

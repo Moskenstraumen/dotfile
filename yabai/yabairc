@@ -64,7 +64,6 @@ yabai -m signal --add event=window_deminimized action="sketchybar --trigger yaba
 # System
 yabai -m rule --add app="^(Calculator|Software Update|Dictionary|System Preferences|System Settings|Photo Booth|Archive Utility|Python|LibreOffice|App Store|Activity Monitor)$" manage=off
 yabai -m rule --add label="About This Mac" app="System Information" title="About This Mac" manage=off
-yabai -m rule --add label="Select file to save to" app="^Inkscape$" title="Select file to save to" manage=off
 yabai -m rule --add app="^Finder$" manage=off
 yabai -m rule --add app="^Terminal$" manage=off
 yabai -m rule --add app="^(Notes|Reminders)$" manage=off

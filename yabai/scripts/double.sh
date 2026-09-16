@@ -39,7 +39,6 @@ yabai -m display --focus "$MAIN" 2>/dev/null || true
 # 6. DEFINE RULES
 # Use labels instead of hardcoded indexes since indexes may vary
 yabai -m rule --add app="^ChatGPT$" space=work
-yabai -m rule --add app="^Microsoft Word$" space=note
 yabai -m rule --add app="^Obsidian$" space=note
 yabai -m rule --add app="^Feishu$" space=chat
 yabai -m rule --add app="^WeChat$" space=chat

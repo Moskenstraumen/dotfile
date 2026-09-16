@@ -13,12 +13,7 @@ set -euo pipefail
 
 require curl git tar
 
-# setup.sh has already checked and warned; this profile only needs the answer,
-# to decide whether writing the login hand-off below is worth anything.
 HAVE_ZSH="${DOTFILES_HAVE_ZSH:-0}"
-if [ "$HAVE_ZSH" -eq 0 ]; then
-	warn "this profile cannot install zsh without root"
-fi
 
 os="$(platform_os)"
 arch="$(platform_arch)"
@@ -47,6 +42,32 @@ esac
 
 mkdir -p "$INSTALL_DIR" "$HOME/.local/share" "$HOME/.local/lib"
 export PATH="$INSTALL_DIR:$PATH"
+
+# "No root" is what this profile is built for, but it is not a given either
+# way: a DSW/devbox container often runs as root, and a cluster login node
+# never does. Try the package manager, then fall back to a static build that
+# needs no privileges at all. Has to run before install_zsh_framework, which
+# skips oh-my-zsh when zsh is missing, and after PATH picks up INSTALL_DIR,
+# which is where the static build lands.
+if [ "$HAVE_ZSH" -eq 0 ]; then
+	log "installing zsh"
+	if install_system_zsh; then
+		zsh_source="the system package manager"
+	elif install_static_zsh; then
+		zsh_source="a static build in $HOME/.local"
+	else
+		zsh_source=""
+	fi
+
+	hash -r
+	if [ -n "$zsh_source" ] && have zsh; then
+		HAVE_ZSH=1
+		log "zsh $(zsh -c 'print -r -- $ZSH_VERSION' 2>/dev/null) via $zsh_source"
+	else
+		warn "could not install zsh"
+		warn "the linked config will sit unused until zsh is available"
+	fi
+fi
 
 log "linking configuration"
 apply_manifest "${MANIFEST_REMOTE[@]}"
@@ -108,7 +129,15 @@ prefer_zsh_at_login() {
 		return
 	fi
 
+	# PATH comes first: everything this profile installs lands in ~/.local/bin,
+	# including zsh itself when it had to be a static build, and a bash login
+	# shell has no reason to be looking there yet.
 	block="$marker
+case \":\$PATH:\" in
+	*\":\$HOME/.local/bin:\"*) ;;
+	*) PATH=\"\$HOME/.local/bin:\$PATH\"; export PATH ;;
+esac
+
 case \$- in
 	*i*)
 		if [ -z \"\${ZSH_VERSION:-}\" ] && [ -t 1 ] && command -v zsh >/dev/null 2>&1; then

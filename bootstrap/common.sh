@@ -176,6 +176,57 @@ install_release_binary() {
 
 # oh-my-zsh and its plugins are git checkouts on both sides: Homebrew does
 # not package them, so the macOS profile needs this just as much as remote.
+# Install zsh through the system package manager. Plenty of "remote" boxes are
+# containers where the account is root after all, so this is worth trying
+# before falling back to the no-root warning.
+#
+# Needs root outright or a passwordless sudo: prompting for a password midway
+# through a bootstrap on a shared node is worse than skipping the install.
+install_system_zsh() {
+	local sudo_cmd=""
+
+	# bash always sets EUID; id is only the fallback for a stripped PATH.
+	if [ "${EUID:-$(id -u)}" -ne 0 ]; then
+		if have sudo && sudo -n true 2>/dev/null; then
+			sudo_cmd="sudo"
+		else
+			return 1
+		fi
+	fi
+
+	# env carries DEBIAN_FRONTEND across sudo, which strips the environment.
+	if have apt-get; then
+		$sudo_cmd apt-get update -qq >/dev/null 2>&1 || true
+		$sudo_cmd env DEBIAN_FRONTEND=noninteractive \
+			apt-get install -y -qq zsh >/dev/null 2>&1
+	elif have dnf; then
+		$sudo_cmd dnf install -y zsh >/dev/null 2>&1
+	elif have yum; then
+		$sudo_cmd yum install -y zsh >/dev/null 2>&1
+	elif have apk; then
+		$sudo_cmd apk add --no-cache zsh >/dev/null 2>&1
+	elif have zypper; then
+		$sudo_cmd zypper --non-interactive install zsh >/dev/null 2>&1
+	elif have pacman; then
+		$sudo_cmd pacman -Sy --noconfirm zsh >/dev/null 2>&1
+	else
+		return 1
+	fi
+}
+
+# Fallback for a box with no root at all: romkatv/zsh-bin publishes fully
+# static, relocatable zsh builds and an installer that drops one into a prefix
+# of our choosing. $HOME/.local is already INSTALL_DIR's parent and already on
+# PATH, so this lands exactly where every other tool in this profile does.
+#
+# -e no leaves /etc/shells alone, since writing it needs the root we do not
+# have here; -a makes the installer verify the download before unpacking it.
+install_static_zsh() {
+	have curl || return 1
+	sh -c "$(curl -fsSL https://raw.githubusercontent.com/romkatv/zsh-bin/master/install)" -- \
+		-q -d "$HOME/.local" -e no -a sha256 -a md5 >/dev/null 2>&1
+}
+
 install_zsh_framework() {
 	local custom
 

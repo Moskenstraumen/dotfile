@@ -4,7 +4,6 @@
 # Local generated files
 *.bak
 *.log
-yazi/plugins/git.yazi/
 
 # Tags
 tags
@@ -13,31 +12,27 @@ GTAGS
 GRTAGS
 GPATH
 
-# gitignore for the git bare repo managing dotfiles
-
-asciinema/install-id
-fontforge/
+# Machine-local state and credentials — never tracked
 gh/
-gtk*/
+mole/
 karabiner/*backups/
-lazygit/*
-lazygit/config.yml
-leetcode-cookie
-misc/
-vifm/vifminfo.json
-vifm/vifm-help.txt
+.claude/
+
+# zsh runtime state
 zsh/.zsh_sessions/
 zsh/.zsh_history
-zsh/.zim/
 zsh/.zcompcache/
 zsh/.zcompdump*
 zsh/*.zwc*
-mole/
-karabiner/automatic_backups/*
 
-.claude/
-ccstatusline/
-sketchybar_backup/
-zed/prompts/
-zed/snippets/
-zed/*.before-*
+# Secrets are sourced if present; only the example is tracked
+zsh/secrets.zsh
+
+# otty: themes and recipes ship with the app, fonts are installed locally
+otty/themes/
+otty/recipes/
+otty/fonts/*
+!otty/fonts/README.md
+
+# no longer managed here
+zed/

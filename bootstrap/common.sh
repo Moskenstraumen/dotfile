@@ -192,6 +192,42 @@ install_zsh_framework() {
 	sync_git_repo https://github.com/zsh-users/zsh-syntax-highlighting "$custom/plugins/zsh-syntax-highlighting"
 }
 
+# nvm is a shell function, not a binary, so it is a git checkout on both
+# sides. PROFILE=/dev/null stops its installer appending to the zshrc,
+# which is a symlink into this repo.
+install_nvm() {
+	local tag
+	export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+
+	if ! tag="$(gh_api https://api.github.com/repos/nvm-sh/nvm/releases/latest | json_field tag_name | head -n1)" ||
+		[ -z "$tag" ]; then
+		warn "could not determine the latest nvm release"
+		return 1
+	fi
+
+	if [ -s "$NVM_DIR/nvm.sh" ]; then
+		if [ -d "$NVM_DIR/.git" ]; then
+			git -C "$NVM_DIR" fetch --tags --quiet origin 2>/dev/null &&
+				git -C "$NVM_DIR" checkout --quiet "$tag" 2>/dev/null ||
+				warn "could not update nvm to $tag"
+		fi
+	else
+		curl -fsSL "https://raw.githubusercontent.com/nvm-sh/nvm/$tag/install.sh" |
+			PROFILE=/dev/null bash >/dev/null || {
+			warn "nvm install failed"
+			return 1
+		}
+	fi
+
+	# shellcheck source=/dev/null
+	. "$NVM_DIR/nvm.sh"
+	if nvm install --lts >/dev/null 2>&1; then
+		log "node $(node --version 2>/dev/null) via nvm $tag"
+	else
+		warn "could not install the latest node LTS"
+	fi
+}
+
 # Clone $1 into $2, or fast-forward it if it is already there.
 sync_git_repo() {
 	local url="$1" dest="$2"

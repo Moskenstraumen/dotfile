@@ -15,6 +15,10 @@ if ! have brew; then
 	die "Homebrew is required: https://brew.sh"
 fi
 
+# The Brewfile has npm entries, so node has to exist before bundling.
+log "installing nvm and the latest node LTS"
+install_nvm || warn "continuing without node; npm entries in the Brewfile will be skipped"
+
 log "installing packages from bootstrap/Brewfile"
 brew bundle --file "$DOTFILES_ROOT/bootstrap/Brewfile"
 

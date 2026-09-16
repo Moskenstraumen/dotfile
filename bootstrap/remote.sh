@@ -81,6 +81,9 @@ install_release_binary ajeetdsouza/zoxide zoxide \
 install_release_binary junegunn/fzf fzf \
 	"fzf-[^/]+-${os}_${go_arch}\\.tar\\.gz$" || failed+=(fzf)
 
+log "installing nvm and the latest node LTS"
+install_nvm || failed+=(nvm)
+
 if [ "${#failed[@]}" -gt 0 ]; then
 	warn "could not install: ${failed[*]}"
 	warn "re-run after setting GITHUB_TOKEN if this was an API rate limit"

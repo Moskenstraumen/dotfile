@@ -75,6 +75,13 @@ syntax-highlighting plugins, and these prebuilt release binaries into
 | ripgrep (`rg`) | content search |
 | fd | filename search |
 | lazygit | git TUI |
+| zoxide | frecency jumps; takes over `cd` |
+| fzf | fuzzy filter, Ctrl-R and Ctrl-T bindings |
+
+It also installs nvm and the latest node LTS. nvm is a shell function rather
+than a binary, so it is a git checkout on both sides; its installer is run with
+`PROFILE=/dev/null` to stop it appending to the zshrc, which is a symlink into
+this repo.
 
 It does **not** install zsh itself — no root, no package manager — and warns
 instead of failing when zsh is missing. There is no editor either; `vi` is
@@ -89,7 +96,8 @@ Unauthenticated GitHub API calls are limited to 60/hour per IP, which a shared
 login node may already have spent. Export `GITHUB_TOKEN` if downloads start
 failing.
 
-The local profile installs everything through `brew bundle` from
+The local profile installs nvm first, because the Brewfile has `npm` entries
+that need node on `PATH`, then everything else through `brew bundle` from
 `bootstrap/Brewfile`; refresh it with `brew bundle dump --force --file
 bootstrap/Brewfile`.
 

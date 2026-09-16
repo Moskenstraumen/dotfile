@@ -5,7 +5,9 @@ ZSH_THEME=""
 
 plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 
-source $ZSH/oh-my-zsh.sh
+# Guarded: a bootstrap that could not finish should cost me the plugins,
+# not the whole shell — starship, aliases and zoxide below still load.
+[[ -f $ZSH/oh-my-zsh.sh ]] && source $ZSH/oh-my-zsh.sh
 
 # Set once, here. proxy_on and proxy_off leave it alone.
 export no_proxy="localhost,127.0.0.1,::1"

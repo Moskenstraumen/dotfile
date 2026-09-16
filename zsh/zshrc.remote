@@ -9,7 +9,9 @@ plugins=(
     zsh-syntax-highlighting
 )
 
-source $ZSH/oh-my-zsh.sh
+# Guarded: a bootstrap that could not finish should cost me the plugins,
+# not the whole shell — starship, aliases and zoxide below still load.
+[[ -f $ZSH/oh-my-zsh.sh ]] && source $ZSH/oh-my-zsh.sh
 
 export TERM=xterm-256color
 export PATH="$HOME/.local/bin:$PATH"

@@ -237,10 +237,20 @@ install_zsh_framework() {
 		return
 	fi
 
+	# Test for the entry point the zshrc sources, not just the directory. A run
+	# on a box without zsh leaves a half-written directory behind, and a bare
+	# -d test then reports "already installed" forever while every new shell
+	# fails on a missing oh-my-zsh.sh. Nothing without that file was ever a
+	# working install, so clearing it is safe and is the only way out.
+	if [ -d "$HOME/.oh-my-zsh" ] && [ ! -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
+		warn "clearing an incomplete oh-my-zsh at $HOME/.oh-my-zsh"
+		rm -rf "$HOME/.oh-my-zsh"
+	fi
+
 	# ZSH must be set explicitly: the installer aborts if it inherits an
 	# exported ZSH from the calling shell, which every zshrc here sets.
 	# Failure is warned about, not fatal, so the tools below still install.
-	if [ ! -d "$HOME/.oh-my-zsh" ]; then
+	if [ ! -f "$HOME/.oh-my-zsh/oh-my-zsh.sh" ]; then
 		ZSH="$HOME/.oh-my-zsh" RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c \
 			"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" ||
 			warn "oh-my-zsh install failed"

@@ -1,7 +1,7 @@
 # Aliases and functions that hold on every machine.
 # Anything environment-specific belongs in alias.local.zsh or alias.remote.zsh.
 
-unalias proxy_on proxy_off proxy_sg ws 2>/dev/null || true
+unalias proxy_on proxy_off ws 2>/dev/null || true
 
 alias ll='ls -alF'
 alias la='ls -A'

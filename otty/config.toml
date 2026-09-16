@@ -1,0 +1,57 @@
+theme = "Glass Dark"
+theme-dark = "Glass Dark"
+foreground = "#f7f8ff"
+background = "#40434b"
+palette-0 = "#252a35"
+open-with-app = "Zed|dev.zed.Zed"
+
+omit-otty-prefix = true
+
+font-family = "Maple Mono NF CN"
+
+details-panel-width = 264
+
+# editor-vim = true (reset to default)
+
+file-open-with = "otty"
+
+folder-open-with = "otty"
+
+# unfocused-split-opacity = 0.65 (reset to default)
+
+cursor-animation = "smooth"
+
+confirm-close-pane = "never"
+
+# auto-hide-tabs-panel = "always" (reset to default)
+
+# font-size = 14 (reset to default)
+
+auto-theme-dark-mode = false
+
+palette-1 = "#ff8a8a"
+palette-2 = "#a8d46f"
+palette-3 = "#e8c778"
+palette-4 = "#8db7ff"
+palette-5 = "#d1a3ff"
+palette-6 = "#7fd6c2"
+palette-7 = "#e3e6f0"
+palette-8 = "#747b8e"
+palette-9 = "#ffb0a8"
+palette-10 = "#c8ea90"
+palette-11 = "#f2da9a"
+palette-12 = "#b2ccff"
+palette-13 = "#e0c2ff"
+palette-14 = "#a3e6d8"
+
+# font-blending = "linear" (reset to default)
+
+# selection-foreground = "#2f2b2c" (reset to default)
+# cursor-text = "#2f2b2c" (reset to default)
+
+# palette-15 = "#e0def4" (reset to default)
+
+selection-background = "#bbc9ed"
+cursor-color = "#f7f8ff"
+
+macos-option-as-alt = "left"

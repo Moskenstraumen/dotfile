@@ -1,0 +1,189 @@
+#!/usr/bin/env bash
+# Helpers shared by bootstrap/local.sh and bootstrap/remote.sh.
+# This file is sourced, never executed directly.
+
+: "${DOTFILES_ROOT:?DOTFILES_ROOT must be set before sourcing common.sh}"
+INSTALL_DIR="${INSTALL_DIR:-$HOME/.local/bin}"
+
+log()  { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
+warn() { printf '\033[1;33mwarn:\033[0m %s\n' "$*" >&2; }
+die()  { printf '\033[1;31merror:\033[0m %s\n' "$*" >&2; exit 1; }
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+require() {
+	local cmd
+	for cmd in "$@"; do
+		have "$cmd" || die "$cmd is required but not installed"
+	done
+}
+
+platform_os() { uname -s | tr '[:upper:]' '[:lower:]'; }
+
+platform_arch() {
+	case "$(uname -m)" in
+		x86_64|amd64) echo x86_64 ;;
+		aarch64|arm64) echo aarch64 ;;
+		*) uname -m ;;
+	esac
+}
+
+# Absolute path of $1, which need not exist yet.
+abspath() {
+	local path="$1" dir base
+	if [ -d "$path" ]; then
+		(cd "$path" && pwd)
+		return
+	fi
+	dir="$(dirname "$path")"
+	base="$(basename "$path")"
+	dir="$(cd "$dir" 2>/dev/null && pwd || printf '%s' "$dir")"
+	printf '%s/%s\n' "${dir%/}" "$base"
+}
+
+# Symlink $1 to $2, backing up anything real already sitting at $2.
+link_managed_path() {
+	local source="$1" target="$2" backup
+
+	if [ ! -e "$source" ]; then
+		warn "skipping $target: $source does not exist"
+		return
+	fi
+
+	# The repo is checked out at the target path already; nothing to link.
+	if [ "$(abspath "$source")" = "$(abspath "$target")" ]; then
+		return
+	fi
+
+	mkdir -p "$(dirname "$target")"
+
+	if [ -L "$target" ]; then
+		ln -sfn "$source" "$target"
+		return
+	fi
+
+	if [ -e "$target" ]; then
+		backup="${target}.backup.$(date +%Y%m%d%H%M%S)"
+		mv "$target" "$backup"
+		log "backed up $target -> $backup"
+	fi
+
+	ln -s "$source" "$target"
+	log "linked $target -> $source"
+}
+
+# Link every "source|target" entry passed in. Relative sources resolve
+# against DOTFILES_ROOT so the repo works from any checkout location.
+apply_manifest() {
+	local entry source target
+	for entry in "$@"; do
+		source="${entry%%|*}"
+		target="${entry#*|}"
+		case "$source" in
+			/*) ;;
+			*) source="$DOTFILES_ROOT/$source" ;;
+		esac
+		link_managed_path "$source" "$target"
+	done
+}
+
+first_semver() { grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' | head -n1; }
+
+# Version of an installed binary, empty if absent or unparseable.
+installed_version() {
+	local bin="$1"
+	have "$bin" || return 0
+	"$bin" --version 2>/dev/null | head -n3 | first_semver
+}
+
+gh_api() {
+	if [ -n "${GITHUB_TOKEN:-}" ]; then
+		curl -fsSL -H "Authorization: Bearer $GITHUB_TOKEN" "$1"
+	else
+		curl -fsSL "$1"
+	fi
+}
+
+json_field() { sed -n "s/.*\"$1\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p"; }
+
+# install_release_binary <owner/repo> <binary> <asset-regex>...
+# Installs into INSTALL_DIR, but only when the published release is newer
+# than what is already on PATH. Unversioned or unparseable installs are
+# always replaced, so "latest" stays true even for odd --version output.
+# Extra regexes are fallbacks, tried in order, so callers can prefer a
+# static musl build and settle for glibc when a project ships only that.
+install_release_binary() {
+	local repo="$1" bin="$2"
+	shift 2
+	local patterns=("$@")
+	local json tag latest current url tmp found resolved pattern
+
+	if ! json="$(gh_api "https://api.github.com/repos/$repo/releases/latest")"; then
+		warn "GitHub API request for $repo failed; set GITHUB_TOKEN if rate limited"
+		return 1
+	fi
+
+	tag="$(printf '%s\n' "$json" | json_field tag_name | head -n1)"
+	latest="$(printf '%s\n' "$tag" | first_semver)"
+	current="$(installed_version "$bin")"
+
+	if [ -n "$current" ] && [ -n "$latest" ] && [ "$current" = "$latest" ]; then
+		log "$bin $current is up to date"
+		return 0
+	fi
+
+	for pattern in "${patterns[@]}"; do
+		url="$(printf '%s\n' "$json" | json_field browser_download_url | grep -Ei "$pattern" | head -n1)"
+		[ -n "$url" ] && break
+	done
+	if [ -z "$url" ]; then
+		warn "no $repo asset in $tag matched: ${patterns[*]}"
+		return 1
+	fi
+
+	tmp="$(mktemp -d)" || return 1
+	if ! curl -fsSL "$url" -o "$tmp/asset"; then
+		warn "download failed: $url"
+		rm -rf "$tmp"
+		return 1
+	fi
+
+	case "$url" in
+		*.tar.gz|*.tgz) tar -xzf "$tmp/asset" -C "$tmp" ;;
+		*.tar.xz)       tar -xJf "$tmp/asset" -C "$tmp" ;;
+		*.zip)          unzip -qo "$tmp/asset" -d "$tmp" ;;
+		*)              mv "$tmp/asset" "$tmp/$bin" ;;
+	esac
+
+	found="$(find "$tmp" -type f -name "$bin" -print 2>/dev/null | head -n1)"
+	if [ -z "$found" ]; then
+		warn "no $bin binary inside $url"
+		rm -rf "$tmp"
+		return 1
+	fi
+
+	mkdir -p "$INSTALL_DIR"
+	install -m 0755 "$found" "$INSTALL_DIR/$bin"
+	rm -rf "$tmp"
+	hash -r 2>/dev/null || true
+	log "installed $bin ${latest:-$tag}${current:+ (was $current)}"
+
+	resolved="$(command -v "$bin" 2>/dev/null || true)"
+	if [ -n "$resolved" ] && [ "$resolved" != "$INSTALL_DIR/$bin" ]; then
+		warn "$resolved shadows $INSTALL_DIR/$bin; put $INSTALL_DIR earlier in PATH"
+	fi
+}
+
+# Clone $1 into $2, or fast-forward it if it is already there.
+sync_git_repo() {
+	local url="$1" dest="$2"
+	if [ -d "$dest/.git" ]; then
+		git -C "$dest" pull --ff-only --quiet 2>/dev/null ||
+			warn "could not update $dest"
+	elif [ -e "$dest" ]; then
+		warn "skipping $dest: exists but is not a git checkout"
+	else
+		git clone --depth=1 --quiet "$url" "$dest"
+		log "cloned $(basename "$dest")"
+	fi
+}

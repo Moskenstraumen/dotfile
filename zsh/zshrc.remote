@@ -38,12 +38,7 @@ export NVM_DIR="$HOME/.nvm"
 # zoxide takes over cd itself: plain paths still work, anything else is a
 # frecency jump. `cdi` picks interactively. Directory tab-completion is
 # unaffected; zoxide only adds its own query on Space-Tab.
-if command -v zoxide >/dev/null; then
-  eval "$(zoxide init zsh --cmd cd)"
-  # Keep the old muscle memory working.
-  alias z='cd'
-  alias zi='cdi'
-fi
+command -v zoxide >/dev/null && eval "$(zoxide init zsh --cmd cd)"
 
 # Guarded: a rate-limited bootstrap may not have installed fzf either.
 command -v fzf >/dev/null && eval "$(fzf --zsh)"

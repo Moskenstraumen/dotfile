@@ -9,6 +9,7 @@ set -euo pipefail
 : "${DOTFILES_ROOT:?run this through setup.sh}"
 . "$DOTFILES_ROOT/bootstrap/common.sh"
 . "$DOTFILES_ROOT/bootstrap/manifest.sh"
+. "$DOTFILES_ROOT/bootstrap/pins.sh"
 
 require curl git tar
 
@@ -81,7 +82,7 @@ install_release_binary ajeetdsouza/zoxide zoxide \
 install_release_binary junegunn/fzf fzf \
 	"fzf-[^/]+-${os}_${go_arch}\\.tar\\.gz$" || failed+=(fzf)
 
-log "installing nvm and the latest node LTS"
+log "installing nvm and node ${NODE_VERSION}"
 install_nvm || failed+=(nvm)
 
 if [ "${#failed[@]}" -gt 0 ]; then

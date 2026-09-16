@@ -8,6 +8,7 @@ set -euo pipefail
 : "${DOTFILES_ROOT:?run this through setup.sh}"
 . "$DOTFILES_ROOT/bootstrap/common.sh"
 . "$DOTFILES_ROOT/bootstrap/manifest.sh"
+. "$DOTFILES_ROOT/bootstrap/pins.sh"
 
 [ "$(platform_os)" = "darwin" ] || die "the local profile only supports macOS"
 
@@ -16,13 +17,46 @@ if ! have brew; then
 fi
 
 # The Brewfile has npm entries, so node has to exist before bundling.
-log "installing nvm and the latest node LTS"
+log "installing nvm and node ${NODE_VERSION}"
 install_nvm || warn "continuing without node; npm entries in the Brewfile will be skipped"
 
+# --no-upgrade because brew bundle otherwise upgrades everything it touches,
+# before anything has had a chance to be pinned.
 log "installing packages from bootstrap/Brewfile"
-brew bundle --file "$DOTFILES_ROOT/bootstrap/Brewfile"
+brew bundle --no-upgrade --file "$DOTFILES_ROOT/bootstrap/Brewfile"
 
-log "upgrading installed packages"
+pin_packages() {
+	local kind="$1" name
+	shift
+	for name in "$@"; do
+		brew list "--$kind" "$name" >/dev/null 2>&1 || continue
+		brew list --pinned 2>/dev/null | grep -qx "$name" && continue
+		brew pin "--$kind" "$name" >/dev/null 2>&1 ||
+			warn "could not pin $name"
+	done
+}
+
+# Expanding an empty array is an unbound-variable error under `set -u` in the
+# bash 3.2 that ships with macOS, so every use is guarded by a count first.
+pinned_all=()
+if [ "${#BREW_PINNED_FORMULAE[@]}" -gt 0 ]; then
+	pinned_all+=("${BREW_PINNED_FORMULAE[@]}")
+fi
+if [ "${#BREW_PINNED_CASKS[@]}" -gt 0 ]; then
+	pinned_all+=("${BREW_PINNED_CASKS[@]}")
+fi
+
+if [ "${#pinned_all[@]}" -gt 0 ]; then
+	log "holding back: ${pinned_all[*]}"
+	if [ "${#BREW_PINNED_FORMULAE[@]}" -gt 0 ]; then
+		pin_packages formula "${BREW_PINNED_FORMULAE[@]}"
+	fi
+	if [ "${#BREW_PINNED_CASKS[@]}" -gt 0 ]; then
+		pin_packages cask "${BREW_PINNED_CASKS[@]}"
+	fi
+fi
+
+log "upgrading everything else"
 brew upgrade
 
 log "syncing zsh framework and plugins"

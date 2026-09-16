@@ -123,6 +123,19 @@ The `$-` and `-t 1` guards mean it only fires for a real interactive login, so
 `scp`, `rsync` and `ssh host cmd` keep working. It is fenced with markers and
 only appended once.
 
+## Pinned versions
+
+Everything tracks the newest release except what is listed in
+`bootstrap/pins.sh`, which records each exception and why. Today that is node
+(held at a major version, since the Brewfile's `npm` globals do not follow a
+major jump) and yabai (hooks into undocumented macOS internals; a bump can mean
+reinstalling the scripting addition and re-checking SIP).
+
+`brew bundle` upgrades by default, so the local profile runs it with
+`--no-upgrade`, applies the pins, and only then runs `brew upgrade` — which
+skips pinned packages. Casks can be pinned too, which matters because
+`brew upgrade` also touches casks that declare `auto_updates`.
+
 ## Secrets
 
 Never committed. Copy `zsh/secrets.zsh.example` to `~/.config/zsh/secrets.zsh`

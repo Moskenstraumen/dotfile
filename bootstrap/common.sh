@@ -196,7 +196,7 @@ install_zsh_framework() {
 # sides. PROFILE=/dev/null stops its installer appending to the zshrc,
 # which is a symlink into this repo.
 install_nvm() {
-	local tag
+	local tag version="${NODE_VERSION:-22}"
 	export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
 
 	if ! tag="$(gh_api https://api.github.com/repos/nvm-sh/nvm/releases/latest | json_field tag_name | head -n1)" ||
@@ -221,10 +221,15 @@ install_nvm() {
 
 	# shellcheck source=/dev/null
 	. "$NVM_DIR/nvm.sh"
-	if nvm install --lts >/dev/null 2>&1; then
-		log "node $(node --version 2>/dev/null) via nvm $tag"
+
+	# Carry npm globals across when stepping to a newer patch of the same
+	# major; the flag fails when there is no current node to copy from.
+	if nvm install "$version" --reinstall-packages-from=current >/dev/null 2>&1 ||
+		nvm install "$version" >/dev/null 2>&1; then
+		nvm alias default "$version" >/dev/null 2>&1 || true
+		log "node $(node --version 2>/dev/null) (pinned to $version) via nvm $tag"
 	else
-		warn "could not install the latest node LTS"
+		warn "could not install node $version"
 	fi
 }
 

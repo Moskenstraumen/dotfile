@@ -16,6 +16,19 @@ if ! have brew; then
 	die "Homebrew is required: https://brew.sh"
 fi
 
+# macOS ships zsh at /bin/zsh, so this only fires where it has been removed or
+# PATH is broken. Unlike the remote profile, this one can actually fix it, and
+# it has to happen before install_zsh_framework skips oh-my-zsh further down.
+if [ "${DOTFILES_HAVE_ZSH:-0}" -eq 0 ]; then
+	log "installing zsh"
+	if brew install zsh; then
+		hash -r
+		log "zsh installed at $(command -v zsh); run chsh -s \"$(command -v zsh)\" to make it your login shell"
+	else
+		warn "could not install zsh"
+	fi
+fi
+
 # The Brewfile has npm entries, so node has to exist before bundling.
 log "installing nvm and node ${NODE_VERSION}"
 install_nvm || warn "continuing without node; npm entries in the Brewfile will be skipped"

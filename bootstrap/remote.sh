@@ -13,14 +13,11 @@ set -euo pipefail
 
 require curl git tar
 
-# zsh is not installable without root, so its absence is a warning rather
-# than a failure: the binaries below are still worth having.
-if have zsh; then
-	HAVE_ZSH=1
-else
-	HAVE_ZSH=0
-	warn "zsh is not installed and this profile cannot install it without root"
-	warn "the linked config will sit unused until zsh is available"
+# setup.sh has already checked and warned; this profile only needs the answer,
+# to decide whether writing the login hand-off below is worth anything.
+HAVE_ZSH="${DOTFILES_HAVE_ZSH:-0}"
+if [ "$HAVE_ZSH" -eq 0 ]; then
+	warn "this profile cannot install zsh without root"
 fi
 
 os="$(platform_os)"

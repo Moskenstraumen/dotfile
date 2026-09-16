@@ -179,6 +179,13 @@ install_release_binary() {
 install_zsh_framework() {
 	local custom
 
+	# The oh-my-zsh installer refuses to run without zsh on PATH, so there is
+	# nothing to do here on a box that has none.
+	if ! have zsh; then
+		warn "skipping oh-my-zsh: zsh is not installed"
+		return
+	fi
+
 	# ZSH must be set explicitly: the installer aborts if it inherits an
 	# exported ZSH from the calling shell, which every zshrc here sets.
 	# Failure is warned about, not fatal, so the tools below still install.

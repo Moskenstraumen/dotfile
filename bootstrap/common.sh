@@ -179,9 +179,13 @@ install_release_binary() {
 install_zsh_framework() {
 	local custom
 
+	# ZSH must be set explicitly: the installer aborts if it inherits an
+	# exported ZSH from the calling shell, which every zshrc here sets.
+	# Failure is warned about, not fatal, so the tools below still install.
 	if [ ! -d "$HOME/.oh-my-zsh" ]; then
-		RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c \
-			"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+		ZSH="$HOME/.oh-my-zsh" RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c \
+			"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" ||
+			warn "oh-my-zsh install failed"
 	else
 		git -C "$HOME/.oh-my-zsh" pull --ff-only --quiet 2>/dev/null ||
 			warn "could not update oh-my-zsh"
@@ -197,7 +201,10 @@ install_zsh_framework() {
 # which is a symlink into this repo.
 install_nvm() {
 	local tag version="${NODE_VERSION:-22}"
-	export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+	# Pinned to $HOME, not inherited: honouring an exported NVM_DIR makes this
+	# install into whatever nvm the calling shell already had, which is the
+	# wrong target whenever HOME has been overridden.
+	export NVM_DIR="$HOME/.nvm"
 
 	if ! tag="$(gh_api https://api.github.com/repos/nvm-sh/nvm/releases/latest | json_field tag_name | head -n1)" ||
 		[ -z "$tag" ]; then

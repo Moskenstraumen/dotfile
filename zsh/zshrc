@@ -25,8 +25,16 @@ esac
 [[ -f ~/.config/zsh/alias.local.zsh ]]  && source ~/.config/zsh/alias.local.zsh
 [[ -f ~/.config/zsh/secrets.zsh ]]      && source ~/.config/zsh/secrets.zsh
 
-# zoxide replaces the oh-my-zsh z plugin and provides the same `z` command.
-command -v zoxide >/dev/null && eval "$(zoxide init zsh)"
+# zoxide takes over cd itself: plain paths still work, anything else is a
+# frecency jump. `cdi` picks interactively. Directory tab-completion is
+# unaffected; zoxide only adds its own query on Space-Tab.
+if command -v zoxide >/dev/null; then
+  eval "$(zoxide init zsh --cmd cd)"
+  # Keep the old muscle memory working.
+  alias z='cd'
+  alias zi='cdi'
+fi
+
 # Ctrl-R history search, Ctrl-T file insert, Alt-C directory jump.
 command -v fzf >/dev/null && eval "$(fzf --zsh)"
 

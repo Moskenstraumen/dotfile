@@ -5,7 +5,6 @@ ZSH_THEME=""
 
 plugins=(
     git
-    z
     zsh-autosuggestions
     zsh-syntax-highlighting
 )
@@ -35,6 +34,11 @@ export NVM_DIR="$HOME/.nvm"
 [[ -f ~/.config/zsh/alias.common.zsh ]] && source ~/.config/zsh/alias.common.zsh
 [[ -f ~/.config/zsh/alias.remote.zsh ]] && source ~/.config/zsh/alias.remote.zsh
 [[ -f ~/.config/zsh/secrets.zsh ]]      && source ~/.config/zsh/secrets.zsh
+
+# zoxide replaces the oh-my-zsh z plugin and provides the same `z` command.
+# Both are guarded: a rate-limited bootstrap may not have installed them.
+command -v zoxide >/dev/null && eval "$(zoxide init zsh)"
+command -v fzf >/dev/null && eval "$(fzf --zsh)"
 
 # Make sure the cursor is visible again after a dropped connection
 printf '\e[?25h'

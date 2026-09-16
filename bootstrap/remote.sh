@@ -39,10 +39,12 @@ case "$os" in
 	*) die "unsupported OS for the remote profile: $os" ;;
 esac
 
-# lazygit names assets by os and arch rather than by target triple.
+# lazygit and fzf name assets by os and arch rather than by target triple,
+# and disagree with each other about what to call x86_64.
 case "$arch" in
-	aarch64) lazygit_arch="arm64" ;;
-	*)       lazygit_arch="$arch" ;;
+	aarch64) lazygit_arch="arm64";  go_arch="arm64" ;;
+	x86_64)  lazygit_arch="x86_64"; go_arch="amd64" ;;
+	*)       lazygit_arch="$arch";  go_arch="$arch" ;;
 esac
 
 mkdir -p "$INSTALL_DIR" "$HOME/.local/share" "$HOME/.local/lib"
@@ -51,18 +53,8 @@ export PATH="$INSTALL_DIR:$PATH"
 log "linking configuration"
 apply_manifest "${MANIFEST_REMOTE[@]}"
 
-log "syncing zsh plugins"
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
-	RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c \
-		"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-else
-	git -C "$HOME/.oh-my-zsh" pull --ff-only --quiet 2>/dev/null ||
-		warn "could not update oh-my-zsh"
-fi
-
-ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-sync_git_repo https://github.com/zsh-users/zsh-autosuggestions "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
-sync_git_repo https://github.com/zsh-users/zsh-syntax-highlighting "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+log "syncing zsh framework and plugins"
+install_zsh_framework
 
 log "installing tools into $INSTALL_DIR"
 failed=()
@@ -81,6 +73,13 @@ install_release_binary sharkdp/fd fd \
 
 install_release_binary jesseduffield/lazygit lazygit \
 	"lazygit_[^/]+_${os}_${lazygit_arch}\\.tar\\.gz$" || failed+=(lazygit)
+
+install_release_binary ajeetdsouza/zoxide zoxide \
+	"zoxide-[^/]+-${triple_first}\\.tar\\.gz$" \
+	"zoxide-[^/]+-${triple_then}\\.tar\\.gz$" || failed+=(zoxide)
+
+install_release_binary junegunn/fzf fzf \
+	"fzf-[^/]+-${os}_${go_arch}\\.tar\\.gz$" || failed+=(fzf)
 
 if [ "${#failed[@]}" -gt 0 ]; then
 	warn "could not install: ${failed[*]}"

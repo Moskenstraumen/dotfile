@@ -174,6 +174,24 @@ install_release_binary() {
 	fi
 }
 
+# oh-my-zsh and its plugins are git checkouts on both sides: Homebrew does
+# not package them, so the macOS profile needs this just as much as remote.
+install_zsh_framework() {
+	local custom
+
+	if [ ! -d "$HOME/.oh-my-zsh" ]; then
+		RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c \
+			"$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+	else
+		git -C "$HOME/.oh-my-zsh" pull --ff-only --quiet 2>/dev/null ||
+			warn "could not update oh-my-zsh"
+	fi
+
+	custom="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+	sync_git_repo https://github.com/zsh-users/zsh-autosuggestions "$custom/plugins/zsh-autosuggestions"
+	sync_git_repo https://github.com/zsh-users/zsh-syntax-highlighting "$custom/plugins/zsh-syntax-highlighting"
+}
+
 # Clone $1 into $2, or fast-forward it if it is already there.
 sync_git_repo() {
 	local url="$1" dest="$2"

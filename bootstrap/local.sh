@@ -21,6 +21,9 @@ brew bundle --file "$DOTFILES_ROOT/bootstrap/Brewfile"
 log "upgrading installed packages"
 brew upgrade
 
+log "syncing zsh framework and plugins"
+install_zsh_framework
+
 log "linking configuration"
 apply_manifest "${MANIFEST_LOCAL[@]}"
 

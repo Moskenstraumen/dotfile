@@ -24,35 +24,46 @@ HOME = str(Path.home())
 ALI_DIR = "/mnt/cpfs/xuyucheng"
 # ~/.ssh/config's keepalive (300s × 9999) never notices a link that died during
 # sleep; these make a dropped connection exit within ~45s so ws can reconnect it.
-KEEPALIVE = "-o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+#
+# Otty's zsh ssh wrapper mints its ControlMaster socket in a fresh /tmp/otty-ssh.*
+# dir, and every ssh that exits deletes all *empty* such dirs — including those of
+# tabs still connecting, whose ssh then dies on "unix_listener: cannot bind". One
+# unreachable host (stepmind off VPN) took the other tabs down with it. The wrapper
+# leaves a caller-supplied ControlPath alone, so each tab slot gets its own socket
+# ({socket}, filled in per slot). ControlMaster=auto unlinks a stale one before
+# binding; ControlPersist=no ties the master to its tab's session.
+SSH_OPTS = (
+    "-o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+    " -o ControlMaster=auto -o ControlPath={socket} -o ControlPersist=no"
+)
 
-FILES = "files"  # a file-browser tab at ~ (matches any file tab in the group)
-SHELL = "shell"  # a local terminal tab (matches any terminal tab in the group)
+# The local tab kind, named by the pane content type Otty saves for it.
+SHELL = "terminal"  # a local terminal tab (matches any terminal tab in the group)
 
-ALI_SHELL = f"ssh -t {KEEPALIVE} ali 'cd {ALI_DIR} && exec bash'"
-# `bash -ic` loads ~/.bashrc so ~/.local/bin (claude) is on PATH. The fallback shell
+ALI_SHELL = f"ssh -t {SSH_OPTS} ali 'cd {ALI_DIR} && exec zsh -l'"
+# `zsh -ic` loads ~/.zshrc so ~/.local/bin (claude) is on PATH. The fallback shell
 # has to be exec'd *inside* that same interactive shell: as a sibling command
-# (`bash -ic claude; exec bash`) the tab dropped out of ssh back to this Mac when
-# claude exited. IGNOREEOF is inherited by the fallback shell so a stray Ctrl-D —
-# e.g. one more than claude consumed on its way out — no longer closes the ssh
+# (`zsh -ic claude; exec zsh`) the tab dropped out of ssh back to this Mac when
+# claude exited. -o ignoreeof makes the fallback shell shrug off a stray Ctrl-D —
+# e.g. one more than claude consumed on its way out — instead of closing the ssh
 # session; `exit` still does.
 ALI_CLAUDE = (
-    f"ssh -t {KEEPALIVE} ali "
-    f"""'cd {ALI_DIR} && exec env IGNOREEOF=3 bash -ic "claude; exec bash -i"'"""
+    f"ssh -t {SSH_OPTS} ali "
+    f"""'cd {ALI_DIR} && exec zsh -ic "claude; exec zsh -o ignoreeof -i"'"""
 )
 
 # Divider name → the tabs that group should hold, in order. Remote tabs beyond the
 # list reuse its last command when reconnecting.
 LAYOUT = {
-    "local": [FILES, SHELL],
+    "local": [SHELL],
     "ali": [ALI_SHELL, ALI_CLAUDE, ALI_CLAUDE],
-    "stepmind": [f"ssh {KEEPALIVE} stepmind"],
+    "stepmind": [f"ssh {SSH_OPTS} stepmind"],
 }
 
 STATE_DB = Path.home() / "Library/Application Support/io.appmakes.otty/state.db"
 
 # The tab ws runs in can't be reconnected from inside ws, so its command is printed
-# on this marker line for the calling shell to run (see the ws function in alias.zsh).
+# on this marker line for the calling shell to run (see the ws function in zsh/alias.local.zsh).
 SELF_MARKER = "__ws_exec__"
 
 # `do script` runs the command in an existing tab (unlike recipe replay, it presses Enter).
@@ -81,13 +92,16 @@ def otty(*args):
 
 
 def read_groups(window_id):
-    """[(group, [(live tab id, content type)])] in sidebar order.
+    """{group: [(live tab id, {content types})]} in sidebar order.
 
     Dividers only exist in Otty's saved window state, as '---<name>' entries among
-    the saved tab ids. Saved panes share ids with live tabs (minus the t_ prefix),
-    which ties each saved tab to the live tab the CLI and AppleScript drive.
+    the saved tab ids. Saved panes share ids with live panes (minus the p_ prefix),
+    which ties each saved tab to the live tab the CLI and AppleScript drive. Every
+    pane is tried: a split tab keeps the id of its first pane, which may be closed,
+    and the CLI doesn't list file panes, whose ids match their tab's instead.
     """
     live = {t["id"] for t in otty("tab", "list") if t["window_id"] == window_id}
+    pane_tab = {p["id"].removeprefix("p_"): p["tab_id"] for p in otty("pane", "list")}
     db = sqlite3.connect(f"file:{STATE_DB}?mode=ro", uri=True)
     try:
         row = db.execute(
@@ -95,25 +109,27 @@ def read_groups(window_id):
         ).fetchone()
         if row is None:
             sys.exit("ws: Otty hasn't saved this window yet — try again in a moment")
-        groups = [("local", [])]
+        groups = {"local": []}
+        tabs = groups["local"]
         for entry in json.loads(row[0]):
             if entry.startswith("---"):
-                groups.append((entry[3:], []))
+                tabs = groups[entry[3:]] = []
                 continue
-            pane = db.execute(
+            panes = db.execute(
                 "select id, content_type from pane where tab_id = ?"
-                " and (closed_at is null or closed_at = '') order by rowid limit 1",
+                " and (closed_at is null or closed_at = '') order by rowid",
                 (entry,),
-            ).fetchone()
-            if pane and "t_" + pane[0] in live:
-                groups[-1][1].append(("t_" + pane[0], pane[1]))
+            ).fetchall()
+            tab_ids = {pane_tab.get(pane_id, "t_" + pane_id) for pane_id, _ in panes} & live
+            if tab_ids:
+                tabs.append((tab_ids.pop(), {c for _, c in panes}))
         return groups
     finally:
         db.close()
 
 
 def tab_count(groups):
-    return sum(len(tabs) for _, tabs in groups)
+    return sum(map(len, groups.values()))
 
 
 def wait_for_tab(window_id, count):
@@ -130,10 +146,8 @@ def open_tab(window_id, groups, group, kind):
     """Open a tab at the end of `group`; returns the refreshed groups."""
     # New tabs (`tab new` and `view --new-tab`) land right after the focused tab and
     # stay above the next divider; `tab new --after` has no effect on placement.
-    otty("tab", "focus", dict(groups)[group][-1][0])
-    if kind == FILES:
-        otty("view", HOME, "--new-tab")
-    elif kind == SHELL:
+    otty("tab", "focus", groups[group][-1][0])
+    if kind == SHELL:
         otty("tab", "new", "--window", window_id, "--no-focus", "--cwd", HOME)
     else:
         otty("tab", "new", "--window", window_id, "--no-focus", "--command", kind)
@@ -156,23 +170,21 @@ def main():
     window_id, home_tab = pane["window_id"], pane["tab_id"]
 
     groups = read_groups(window_id)
-    ssh_started = False
     self_command = None
 
     for group, wanted in LAYOUT.items():
-        if group not in dict(groups):
+        if group not in groups:
             print(f"{group}: no '{group}' divider — add one (right-click between tabs → Insert Divider)")
             continue
-        if not dict(groups)[group]:
+        if not groups[group]:
             # An empty group can't be filled: a tab placed after the previous group's
             # last tab lands above this group's divider, not under it.
             print(f"{group}: no tabs under the divider — drag one tab under it, then run ws again")
             continue
 
         if group == "local":
-            content_type = {FILES: "file", SHELL: "terminal"}
             for i, kind in enumerate(wanted):
-                if any(c == content_type[kind] for _, c in dict(groups)[group]):
+                if any(kind in types for _, types in groups[group]):
                     state = "open"
                 else:
                     groups = open_tab(window_id, groups, group, kind)
@@ -180,19 +192,15 @@ def main():
                 print(f"local {i + 1}: {state}")
             continue
 
-        for i in range(max(len(dict(groups)[group]), len(wanted))):
-            command = wanted[min(i, len(wanted) - 1)]
-            # Otty's zsh ssh wrapper deletes every *empty* /tmp/otty-ssh.* dir when any
-            # ssh exits, so a fast-failing ssh would wipe the ControlMaster sockets of
-            # tabs still connecting ("unix_listener: cannot bind to path"). Stagger.
-            if ssh_started:
-                time.sleep(2)
-            tabs = dict(groups)[group]
+        for i in range(max(len(groups[group]), len(wanted))):
+            socket = f"{HOME}/.ssh/ws-{group}-{i + 1}"
+            command = wanted[min(i, len(wanted) - 1)].format(socket=socket)
+            tabs = groups[group]
             if i < len(tabs):
                 if tabs[i][0] == home_tab:
                     # This tab is busy running ws itself, and a command sent here now
                     # would be swallowed by the running script — hand it to the shell
-                    # that called ws (see the ws function in zsh/alias.zsh).
+                    # that called ws (see the ws function in zsh/alias.local.zsh).
                     self_command = command
                     state = "self"
                 else:
@@ -200,7 +208,6 @@ def main():
             else:
                 groups = open_tab(window_id, groups, group, command)
                 state = "opened"
-            ssh_started = ssh_started or state in ("reconnected", "opened")
             print(f"{group} {i + 1}: {state}")
 
     otty("tab", "focus", home_tab)

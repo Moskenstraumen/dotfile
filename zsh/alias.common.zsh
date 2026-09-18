@@ -7,7 +7,7 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
-alias src='source ~/.zshrc'
+alias src='source ~/.zshrc; curl -s ipinfo.io'
 
 # no_proxy is set once per environment in the zshrc and deliberately left
 # alone here. Clearing it on a cluster would send internal traffic through

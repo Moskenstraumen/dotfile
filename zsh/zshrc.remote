@@ -22,7 +22,7 @@ setopt INC_APPEND_HISTORY
 
 # Cluster-internal hosts must never go through the proxy. Set once, here.
 # proxy_on and proxy_off leave it alone.
-export no_proxy="10.140.54.27,10.140.70.27,10.0.0.0/8,100.96.0.0/12,172.16.0.0/12,192.168.0.0/16,127.0.0.1,localhost,.pjlab.org.cn"
+export no_proxy="10.140.54.27,10.140.70.27,10.0.0.0/8,100.96.0.0/12,172.16.0.0/12,192.168.0.0/16,127.0.0.1,localhost,.basemind.com,.zyql.com"
 export NO_PROXY="$no_proxy"
 
 export HF_ENDPOINT='https://hf-mirror.com'

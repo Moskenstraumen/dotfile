@@ -17,6 +17,7 @@ app_icon() {
     Alacritty)                       echo "󰆍" ;;
     WezTerm)                         echo "󰆍" ;;
     kitty)                            echo "" ;;
+    Otty|otty)                       echo "" ;;
 
     # Editors / IDE
     Code | "Visual Studio Code" | "Visual Studio Code - Insiders") echo "󰨞" ;;
@@ -70,7 +71,7 @@ app_icon() {
 
 app_font() {
   case "$1" in
-    "Google Chrome"|ChatGPT|Zed|Zotero|Obsidian|Terminal|Feishu|Lark|kitty) echo "sketchybar-app-font:Regular:13.0" ;;
+    "Google Chrome"|ChatGPT|Zed|Zotero|Obsidian|Terminal|Feishu|Lark|kitty|Otty|otty) echo "sketchybar-app-font:Regular:13.0" ;;
     *) echo "Maple Mono NF CN:Medium:13.0" ;;
   esac
 }

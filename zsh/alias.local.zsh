@@ -15,3 +15,6 @@ proxy_on() {
 
 # Enable it automatically when Clash is actually up.
 nc -z 127.0.0.1 7890 2>/dev/null && proxy_on
+
+alias vi='nvim'
+alias vim='nvim'

@@ -1,6 +1,12 @@
 # Login and compute nodes only.
 
-alias vi='vim'
+# nvim when the bootstrap managed to install it, plain vim otherwise.
+if (( $+commands[nvim] )); then
+  alias vi='nvim'
+  alias vim='nvim'
+else
+  alias vi='vim'
+fi
 
 # Proxy on 7890, forwarded in from the workstation or run on the box itself.
 # Like the local one it also sets the SOCKS variables, but it never touches

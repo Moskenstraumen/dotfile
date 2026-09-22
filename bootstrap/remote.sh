@@ -40,6 +40,56 @@ case "$arch" in
 	*)       lazygit_arch="$arch";  go_arch="$arch" ;;
 esac
 
+# neovim and tree-sitter have their own spellings too.
+case "$arch" in
+	aarch64) nvim_arch="arm64";  ts_arch="arm64" ;;
+	x86_64)  nvim_arch="x86_64"; ts_arch="x64" ;;
+	*)       nvim_arch="$arch";  ts_arch="$arch" ;;
+esac
+case "$os" in
+	darwin) release_os="macos" ;;
+	*)      release_os="$os" ;;
+esac
+
+# Neovim is not a single binary: the release tarball carries its runtime
+# next to bin/, so unpack the whole tree under ~/.local/lib and link it in.
+install_nvim() {
+	local json tag latest current url tmp dest="$HOME/.local/lib/nvim"
+
+	if ! json="$(gh_api "https://api.github.com/repos/neovim/neovim/releases/latest")"; then
+		warn "GitHub API request for neovim/neovim failed; set GITHUB_TOKEN if rate limited"
+		return 1
+	fi
+
+	tag="$(printf '%s\n' "$json" | json_field tag_name | head -n1)"
+	latest="$(printf '%s\n' "$tag" | first_semver)"
+	current="$(installed_version nvim)"
+	if [ -n "$current" ] && [ "$current" = "$latest" ]; then
+		log "nvim $current is up to date"
+		return 0
+	fi
+
+	url="$(printf '%s\n' "$json" | json_field browser_download_url |
+		grep -E "nvim-${release_os}-${nvim_arch}\\.tar\\.gz$" | head -n1)"
+	if [ -z "$url" ]; then
+		warn "no neovim asset in $tag for ${release_os}-${nvim_arch}"
+		return 1
+	fi
+
+	tmp="$(mktemp -d)" || return 1
+	if ! curl -fsSL "$url" | tar -xz -C "$tmp" --strip-components=1; then
+		warn "download failed: $url"
+		rm -rf "$tmp"
+		return 1
+	fi
+
+	rm -rf "$dest"
+	mv "$tmp" "$dest"
+	ln -sfn "$dest/bin/nvim" "$INSTALL_DIR/nvim"
+	hash -r 2>/dev/null || true
+	log "installed nvim ${latest:-$tag}${current:+ (was $current)}"
+}
+
 mkdir -p "$INSTALL_DIR" "$HOME/.local/share" "$HOME/.local/lib"
 export PATH="$INSTALL_DIR:$PATH"
 
@@ -100,8 +150,21 @@ install_release_binary ajeetdsouza/zoxide zoxide \
 install_release_binary junegunn/fzf fzf \
 	"fzf-[^/]+-${os}_${go_arch}\\.tar\\.gz$" || failed+=(fzf)
 
+install_nvim || failed+=(neovim)
+
+# LazyVim builds treesitter parsers with this, plus whatever cc is around.
+install_release_binary tree-sitter/tree-sitter tree-sitter \
+	"/tree-sitter-${release_os}-${ts_arch}\\.gz$" || failed+=(tree-sitter)
+
 log "installing nvm and node ${NODE_VERSION}"
 install_nvm || failed+=(nvm)
+
+# Pull plugins at the versions pinned in nvim/lazy-lock.json, so every box
+# runs exactly what the workstation does. Mason tools are left to :Mason.
+if have nvim; then
+	log "restoring neovim plugins from lazy-lock.json"
+	nvim --headless "+Lazy! restore" +qa >/dev/null 2>&1 || failed+=(nvim-plugins)
+fi
 
 if [ "${#failed[@]}" -gt 0 ]; then
 	warn "could not install: ${failed[*]}"

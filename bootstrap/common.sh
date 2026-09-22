@@ -152,6 +152,7 @@ install_release_binary() {
 		*.tar.gz|*.tgz) tar -xzf "$tmp/asset" -C "$tmp" ;;
 		*.tar.xz)       tar -xJf "$tmp/asset" -C "$tmp" ;;
 		*.zip)          unzip -qo "$tmp/asset" -d "$tmp" ;;
+		*.gz)           gunzip -c "$tmp/asset" > "$tmp/$bin" ;;
 		*)              mv "$tmp/asset" "$tmp/$bin" ;;
 	esac
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 source "$HOME/.config/yabai/scripts/utils.sh"
 
-# 1. ENSURE WE HAVE AT LEAST 6 SPACES
-ensure_minimum_spaces 6
+# 1. ENSURE WE HAVE AT LEAST 5 SPACES
+ensure_minimum_spaces 5
 
 # 2. GET THE ACTUAL SPACE INDEXES
 SPACE1=$(get_space_index 1)
@@ -10,15 +10,13 @@ SPACE2=$(get_space_index 2)
 SPACE3=$(get_space_index 3)
 SPACE4=$(get_space_index 4)
 SPACE5=$(get_space_index 5)
-SPACE6=$(get_space_index 6)
 
 # 3. LABEL THE SPACES (all on built-in display already)
 yabai -m space "$SPACE1" --label "work" --layout stack
 yabai -m space "$SPACE2" --label "brow" --layout stack
-yabai -m space "$SPACE3" --label "edit" --layout stack
-yabai -m space "$SPACE4" --label "paper" --layout stack
-yabai -m space "$SPACE5" --label "note" --layout stack
-yabai -m space "$SPACE6" --label "chat" --layout stack
+yabai -m space "$SPACE3" --label "paper" --layout stack
+yabai -m space "$SPACE4" --label "note" --layout stack
+yabai -m space "$SPACE5" --label "chat" --layout stack
 
 # 4. DISABLE GAPPING FOR SINGLE-DISPLAY MODE
 yabai -m config top_padding 0
@@ -30,8 +28,8 @@ yabai -m config window_gap 0
 # 5. DEFINE RULES (Single-Display Layout)
 # Use labels instead of hardcoded indexes
 yabai -m rule --add app="^ChatGPT$" space=work
+yabai -m rule --add app="^Ghostty$" space=work
 yabai -m rule --add app="^Google Chrome$" space=brow
-yabai -m rule --add app="^Ghostty$" space=edit
 yabai -m rule --add app="^Zotero$" space=paper
 yabai -m rule --add app="^Obsidian$" space=note
 yabai -m rule --add app="^Feishu$" space=chat

@@ -71,7 +71,6 @@ hyper - 5       : yabai -m space --focus 5
 # Focus space
 hyper - w       : yabai -m space --focus work
 hyper - b       : yabai -m space --focus brow
-hyper - e       : yabai -m space --focus edit
 hyper - p       : yabai -m space --focus paper
 hyper - n       : yabai -m space --focus note
 hyper - c       : yabai -m space --focus chat

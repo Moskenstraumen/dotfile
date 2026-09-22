@@ -17,7 +17,6 @@ MANIFEST_LOCAL=(
 	"yabai|$HOME/.config/yabai"
 	"skhd|$HOME/.config/skhd"
 	"sketchybar|$HOME/.config/sketchybar"
-	"otty|$HOME/.config/otty"
 	"ghostty|$HOME/.config/ghostty"
 	"herdr/config.toml|$HOME/.config/herdr/config.toml"
 	"karabiner/karabiner.json|$HOME/.config/karabiner/karabiner.json"

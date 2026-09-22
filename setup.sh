@@ -2,7 +2,7 @@
 # Entry point for both environments.
 #
 #   ./setup.sh          pick the profile from the OS
-#   ./setup.sh local    macOS workstation (Homebrew, window manager, otty)
+#   ./setup.sh local    macOS workstation (Homebrew, window manager, Ghostty)
 #   ./setup.sh remote   no-root box: binaries into ~/.local/bin only
 #
 # The repo root is derived from this script, so the checkout can live

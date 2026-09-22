@@ -56,8 +56,6 @@ cask "input-source-pro"
 cask "karabiner-elements"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
-# Terminal emulator built for code agents
-cask "otty"
 # Music streaming service
 cask "spotify"
 # Mesh VPN

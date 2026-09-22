@@ -43,7 +43,6 @@ yabai -m rule --add app="^Obsidian$" space=note
 yabai -m rule --add app="^Feishu$" space=chat
 yabai -m rule --add app="^WeChat$" space=chat
 yabai -m rule --add app="^Google Chrome$" space=brow
-yabai -m rule --add app="^Otty$" space=edit
 yabai -m rule --add app="^Ghostty$" space=edit
 yabai -m rule --add app="^Zotero$" space=paper
 

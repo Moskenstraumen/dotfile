@@ -28,11 +28,5 @@ zsh/*.zwc*
 # Secrets are sourced if present; only the example is tracked
 zsh/secrets.zsh
 
-# otty: themes and recipes ship with the app, fonts are installed locally
-otty/themes/
-otty/recipes/
-otty/fonts/*
-!otty/fonts/README.md
-
 # no longer managed here
 zed/

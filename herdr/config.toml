@@ -1,0 +1,36 @@
+# herdr: agent-aware multiplexer running inside Ghostty.
+# Ghostty maps cmd+ shortcuts onto the prefix sequences below (see ghostty/config).
+
+onboarding = false
+
+[theme]
+# Draw with the terminal's own palette so the Ghostty glass shows through.
+name = "terminal"
+
+[theme.custom]
+panel_bg = "reset"
+
+[keys]
+# ctrl+b is Claude Code's "background task"; ctrl+\ (SIGQUIT) is unused in daily work.
+prefix = "ctrl+backslash"
+# Plain-character keys Ghostty can send as text (see ghostty/config); escape-based
+# sequences like alt+digit or shift+tab don't survive the trip.
+cycle_pane_previous = "prefix+semicolon"
+next_workspace = "prefix+]"
+previous_workspace = "prefix+["
+new_workspace = "prefix+a"
+
+[ui]
+prompt_new_tab_name = false
+status_indicators = "symbols"
+
+[ui.toast]
+# macOS notification when an agent finishes or waits for input.
+delivery = "system"
+
+[experimental]
+# Prefix keys still register while a Chinese input source is active.
+switch_ascii_input_source_in_prefix = true
+# Keep the IME candidate window next to Claude Code's cursor.
+reveal_hidden_cursor_for_cjk_ime = true
+cjk_ime_agents = ["claude"]

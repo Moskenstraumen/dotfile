@@ -13,7 +13,7 @@ app_icon() {
     # Terminals
     Terminal)                        echo "" ;;
     iTerm2)                          echo "󰆍" ;;
-    Ghostty)                         echo "󰊠" ;;
+    Ghostty)                         echo "" ;;
     Alacritty)                       echo "󰆍" ;;
     WezTerm)                         echo "󰆍" ;;
     kitty)                            echo "" ;;
@@ -71,7 +71,7 @@ app_icon() {
 
 app_font() {
   case "$1" in
-    "Google Chrome"|ChatGPT|Zed|Zotero|Obsidian|Terminal|Feishu|Lark|kitty|Otty|otty) echo "sketchybar-app-font:Regular:13.0" ;;
+    "Google Chrome"|ChatGPT|Zed|Zotero|Obsidian|Terminal|Feishu|Lark|kitty|Otty|otty|Ghostty) echo "sketchybar-app-font:Regular:13.0" ;;
     *) echo "Maple Mono NF CN:Medium:13.0" ;;
   esac
 }

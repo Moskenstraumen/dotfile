@@ -1,0 +1,4 @@
+# Runtime state (socket, logs, locks); only the config is tracked.
+*
+!.gitignore
+!config.toml

@@ -50,7 +50,7 @@ that machine gets.
 | `zsh/alias.common.zsh` | yes | yes |
 | `zsh/alias.local.zsh` | yes | — |
 | `zsh/alias.remote.zsh` | — | yes |
-| `yabai` `skhd` `sketchybar` `karabiner` `otty` | yes | — |
+| `yabai` `skhd` `sketchybar` `karabiner` `otty` `ghostty` `herdr` | yes | — |
 
 The window manager, status bar and terminal are macOS-only and never reach a
 remote box. The alias split matters: `alias.local.zsh` turns the proxy on

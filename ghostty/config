@@ -1,0 +1,46 @@
+# Font
+font-family = "Maple Mono NF CN"
+
+# Theme
+theme = glass-dark
+
+# Transparency: Ghostty themes carry colours only, so the glass comes from here.
+background-opacity = 0.6
+background-blur = true
+
+# Window
+macos-titlebar-style = transparent
+window-padding-x = 8
+window-padding-y = 8
+
+# Mouse & Input
+macos-option-as-alt = left
+
+# App Behavior
+confirm-close-surface = false
+
+# herdr: Ghostty stays a single window; these send the herdr prefix (ctrl+\ = 0x1c)
+# plus the action key, so tabs and splits live in herdr and survive detach.
+keybind = cmd+t=text:\x1cc
+keybind = cmd+n=text:\x1ca
+keybind = cmd+d=text:\x1cv
+keybind = cmd+shift+d=text:\x1c-
+keybind = cmd+w=text:\x1cx
+keybind = cmd+enter=text:\x1cz
+keybind = cmd+[=text:\x1c;
+keybind = cmd+bracket_left=text:\x1c;
+keybind = cmd+]=text:\x1c\x09
+keybind = cmd+bracket_right=text:\x1c\x09
+keybind = cmd+shift+[=text:\x1c[
+keybind = cmd+shift+bracket_left=text:\x1c[
+keybind = cmd+shift+]=text:\x1c]
+keybind = cmd+shift+bracket_right=text:\x1c]
+keybind = cmd+digit_1=text:\x1c1
+keybind = cmd+digit_2=text:\x1c2
+keybind = cmd+digit_3=text:\x1c3
+keybind = cmd+digit_4=text:\x1c4
+keybind = cmd+digit_5=text:\x1c5
+keybind = cmd+digit_6=text:\x1c6
+keybind = cmd+digit_7=text:\x1c7
+keybind = cmd+digit_8=text:\x1c8
+keybind = cmd+digit_9=text:\x1c9

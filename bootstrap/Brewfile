@@ -15,6 +15,8 @@ brew "jq"
 brew "herdr"
 # Simple terminal UI for git commands
 brew "lazygit"
+# Ambitious Vim-fork focused on extensibility and agility
+brew "neovim"
 # Deep clean and optimize your Mac
 brew "mole"
 # Search tool like grep and The Silver Searcher
@@ -25,6 +27,8 @@ brew "starship"
 brew "uv"
 # Shell extension to navigate your filesystem faster
 brew "zoxide"
+# Parser generator tool (LazyVim builds treesitter parsers with it)
+brew "tree-sitter-cli"
 # UNIX shell (command interpreter)
 brew "zsh"
 # Simple hotkey-daemon for macOS.

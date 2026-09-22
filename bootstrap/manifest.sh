@@ -18,6 +18,7 @@ MANIFEST_LOCAL=(
 	"skhd|$HOME/.config/skhd"
 	"sketchybar|$HOME/.config/sketchybar"
 	"ghostty|$HOME/.config/ghostty"
+	"nvim|$HOME/.config/nvim"
 	"herdr/config.toml|$HOME/.config/herdr/config.toml"
 	"karabiner/karabiner.json|$HOME/.config/karabiner/karabiner.json"
 	"$HOME/.config/zsh/zshrc|$HOME/.zshrc"

@@ -4,9 +4,8 @@ font-family = "Maple Mono NF CN"
 # Theme
 theme = glass-dark
 
-# Transparency: Ghostty themes carry colours only, so the glass comes from here.
-background-opacity = 0.6
-background-blur = true
+# Transparency lives in the theme file (themes/glass-dark);
+# setting it here would override the per-theme values.
 
 # Window
 macos-titlebar-style = transparent

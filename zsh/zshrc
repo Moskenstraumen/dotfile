@@ -33,8 +33,5 @@ command -v zoxide >/dev/null && eval "$(zoxide init zsh --cmd cd)"
 # Ctrl-R history search, Ctrl-T file insert, Alt-C directory jump.
 command -v fzf >/dev/null && eval "$(fzf --zsh)"
 
-# Reset the cursor to a steady block before each prompt
-_reset_cursor() { printf '\e[2 q\e[?25h' }
-precmd_functions+=(_reset_cursor)
 
 eval "$(starship init zsh)"

@@ -64,3 +64,42 @@ get_space_index() {
   local position=$1
   yabai -m query --spaces | jq -r "sort_by(.index) | .[$(($position - 1))] | .index"
 }
+
+# 3. LABEL SPACES
+# Gives each label to the first unlabeled space; labels that already exist
+# stay where they are, so windows are not shuffled when a display changes
+LABELS=(work brow paper note chat)
+label_spaces() {
+  local label idx
+  for label in "${LABELS[@]}"; do
+    if ! yabai -m query --spaces --space "$label" >/dev/null 2>&1; then
+      idx=$(yabai -m query --spaces | jq -r 'map(select(.label == "")) | min_by(.index) | .index')
+      yabai -m space "$idx" --label "$label"
+    fi
+    yabai -m space "$label" --layout stack
+  done
+}
+
+# 4. SET PADDING AND GAP
+# Usage: set_gaps <px>
+set_gaps() {
+  local side
+  for side in top bottom left right; do
+    yabai -m config "${side}_padding" "$1"
+  done
+  yabai -m config window_gap "$1"
+}
+
+# 5. SEND APPS TO THEIR SPACES
+# Rules resolve labels to indexes when added, so rerun this after spaces move;
+# a rule label replaces the previous rule instead of piling up a new one
+apply_rules() {
+  yabai -m rule --add label=to-chatgpt app="^ChatGPT$" space=work
+  yabai -m rule --add label=to-ghostty app="^Ghostty$" space=work
+  yabai -m rule --add label=to-chrome app="^Google Chrome$" space=brow
+  yabai -m rule --add label=to-zotero app="^Zotero$" space=paper
+  yabai -m rule --add label=to-obsidian app="^Obsidian$" space=note
+  yabai -m rule --add label=to-feishu app="^Feishu$" space=chat
+  yabai -m rule --add label=to-wechat app="^WeChat$" space=chat
+  yabai -m rule --apply
+}

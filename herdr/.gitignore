@@ -1,4 +1,5 @@
-# Runtime state (socket, logs, locks); only the config is tracked.
+# Runtime state (socket, logs, locks); only the configs are tracked.
 *
 !.gitignore
 !config.toml
+!config.remote.toml

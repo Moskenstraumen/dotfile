@@ -27,6 +27,7 @@ setup.sh               profile dispatcher
 bootstrap/
   common.sh            linking, version checks, GitHub release downloads
   manifest.sh          what gets symlinked where, per profile
+  pins.sh              the exceptions to "always latest", each with its reason
   local.sh             macOS: Homebrew, config links, window manager services
   remote.sh            no-root: prebuilt binaries into ~/.local/bin
   Brewfile             the macOS package set
@@ -50,12 +51,34 @@ that machine gets.
 | `zsh/alias.common.zsh` | yes | yes |
 | `zsh/alias.local.zsh` | yes | — |
 | `zsh/alias.remote.zsh` | — | yes |
-| `yabai` `skhd` `sketchybar` `karabiner` `ghostty` `herdr` | yes | — |
+| `yabai` `skhd` `sketchybar` `karabiner` `ghostty` | yes | — |
+| `herdr/config.toml` | yes | — |
+| `herdr/config.remote.toml` | — | yes (linked as `herdr/config.toml`) |
 
 The window manager, status bar and terminal are macOS-only and never reach a
 remote box. The alias split matters: `alias.local.zsh` turns the proxy on
 automatically when Clash is listening on 7890, which must not happen on a
 cluster node.
+
+### herdr
+
+herdr splits its configuration in two, and the split decides which file a
+setting belongs in:
+
+| lives on the client | lives on the server |
+|---|---|
+| `[theme]`, `[keys]`, `[ui]`, copy behaviour, `[remote]` | `[terminal]`, `[server]`, worktrees, integrations, custom commands |
+
+Theme and keybindings come from the machine you are sitting at, **even when
+viewing an SSH machine**, so `herdr/config.toml` drives the UI on both sides and
+the remote file holds only what belongs to the box running the panes.
+`herdr/config.remote.toml` is therefore small on purpose: a `default_shell` that
+skips the bash hand-off in `~/.profile` for new panes, and a wider headless
+terminal so unattended agent output does not wrap at 120 columns.
+
+The prefix is the one shared value that cannot drift: `herdr/config.toml` sets
+`prefix = "ctrl+backslash"` and `ghostty/config` hardcodes that byte (`0x1c`) in
+every `cmd+…` keybind. Change one and the other stops working.
 
 ### Proxies
 
@@ -77,6 +100,8 @@ syntax-highlighting plugins, and these prebuilt release binaries into
 | lazygit | git TUI |
 | zoxide | frecency jumps; takes over `cd` |
 | fzf | fuzzy filter, Ctrl-R and Ctrl-T bindings |
+| neovim | editor; aliased to `vi` and `vim` |
+| tree-sitter | parser CLI, so LazyVim can build parsers |
 
 It also installs nvm and the latest node LTS. nvm is a shell function rather
 than a binary, so it is a git checkout on both sides; its installer is run with
@@ -84,8 +109,14 @@ than a binary, so it is a git checkout on both sides; its installer is run with
 this repo.
 
 It does **not** install zsh itself — no root, no package manager — and warns
-instead of failing when zsh is missing. There is no editor either; `vi` is
-aliased to whatever system vim is present.
+instead of failing when zsh is missing.
+
+Neovim is not a single binary: the release tarball carries its runtime next to
+`bin/`, so the remote profile unpacks the whole tree under `~/.local/lib/nvim`
+and links `bin/nvim` into `~/.local/bin`. It then runs
+`nvim --headless "+Lazy! restore"` to pull plugins at the versions recorded in
+`nvim/lazy-lock.json`, so every box runs what the workstation runs. Mason tools
+are left to `:Mason`.
 
 Static musl builds are preferred because remote glibc is often older than
 release binaries expect. Each install compares the

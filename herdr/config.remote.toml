@@ -1,0 +1,24 @@
+# herdr on a remote box (login node, VPS, container).
+#
+# Presentation settings — [theme], [keys], [ui], copy behaviour — come from the
+# *client's* local config, so they are deliberately absent here: the macOS
+# config.toml already drives the UI over `herdr --remote`, and duplicating it
+# would be two copies to keep in sync.
+#
+# Only settings that belong to the server where the panes actually run live in
+# this file. herdr man page, "Configuration": pane defaults, worktrees,
+# integrations and custom commands are server-side; themes and keybindings are
+# client-side.
+
+[terminal]
+# A remote login shell is bash, and herdr starts panes from whatever $SHELL is
+# there rather than from the hand-off in ~/.profile. Point it at zsh directly so
+# every pane picks up ~/.zshrc — the proxy, nvm and the aliases.
+default_shell = "/usr/bin/zsh"
+
+[server]
+# Wider than the 120x40 default: when no client is attached the server lays
+# panes out at this size, and agent output wrapping badly on a narrow virtual
+# terminal is hard to read back later.
+headless_cols = 160
+headless_rows = 50

@@ -29,6 +29,7 @@ MANIFEST_REMOTE=(
 	"zsh/zshrc.remote|$HOME/.config/zsh/zshrc"
 	"zsh/alias.common.zsh|$HOME/.config/zsh/alias.common.zsh"
 	"zsh/alias.remote.zsh|$HOME/.config/zsh/alias.remote.zsh"
+	"herdr/config.remote.toml|$HOME/.config/herdr/config.toml"
 	"nvim|$HOME/.config/nvim"
 	"$HOME/.config/zsh/zshrc|$HOME/.zshrc"
 )

@@ -101,7 +101,7 @@ syntax-highlighting plugins, and these prebuilt release binaries into
 | zoxide | frecency jumps; takes over `cd` |
 | fzf | fuzzy filter, Ctrl-R and Ctrl-T bindings |
 | neovim | editor; aliased to `vi` and `vim` |
-| tree-sitter | parser CLI, so LazyVim can build parsers |
+| tree-sitter | parser CLI; `nvim-treesitter` shells out to it for `generate` and `build` |
 
 It also installs nvm and the latest node LTS. nvm is a shell function rather
 than a binary, so it is a git checkout on both sides; its installer is run with
@@ -117,6 +117,15 @@ and links `bin/nvim` into `~/.local/bin`. It then runs
 `nvim --headless "+Lazy! restore"` to pull plugins at the versions recorded in
 `nvim/lazy-lock.json`, so every box runs what the workstation runs. Mason tools
 are left to `:Mason`.
+
+Treesitter parsers themselves are neither installed nor pinned here. LazyVim
+builds the ones in its `ensure_installed` list on first use, into
+`~/.local/share/nvim/site/parser/`, using the C compiler and the `tree-sitter`
+binary above. They are per-machine build artifacts, so a box that has seen more
+filetypes will have more of them than one that has not: that is expected, and
+`:TSInstall <lang>` fills the gap rather than anything in this repo. Because
+the CLI is already on `PATH` here, LazyVim skips its own fallback of fetching
+`tree-sitter-cli` through mason at runtime.
 
 Static musl builds are preferred because remote glibc is often older than
 release binaries expect. Each install compares the

@@ -60,7 +60,7 @@ intermediate `~/.config/zsh/zshrc` hop any more.
 | `zsh/alias.local.zsh` | yes | — |
 | `zsh/alias.remote.zsh` | — | yes |
 | `yabai` `skhd` `sketchybar` `karabiner` `ghostty` | yes | — |
-| `herdr/config.toml` | yes | — |
+| `herdr/config.local.toml` | yes (linked as `herdr/config.toml`) | — |
 | `herdr/config.remote.toml` | — | yes (linked as `herdr/config.toml`) |
 
 The window manager, status bar and terminal are macOS-only and never reach a
@@ -95,15 +95,19 @@ setting belongs in:
 | `[theme]`, `[keys]`, `[ui]`, copy behaviour, `[remote]` | `[terminal]`, `[server]`, worktrees, integrations, custom commands |
 
 Theme and keybindings come from the machine you are sitting at, **even when
-viewing an SSH machine**, so `herdr/config.toml` drives the UI on both sides and
-the remote file holds only what belongs to the box running the panes.
-`herdr/config.remote.toml` is therefore small on purpose: a `default_shell` that
-skips the bash hand-off in `~/.profile` for new panes, and a wider headless
-terminal so unattended agent output does not wrap at 120 columns.
+viewing an SSH machine**, so `herdr/config.local.toml` drives the UI on both
+sides and the remote file holds only what belongs to the box running the panes.
+`herdr/config.remote.toml` is therefore small on purpose: a `default_shell` of
+`zsh`, and a wider headless terminal so unattended agent output does not wrap
+at 120 columns. The shell setting is redundant where the bootstrap could
+`chsh`, but on a box that relies on the `~/.profile` hand-off `herdr --remote`
+starts the server from a non-interactive ssh command with `SHELL=/bin/bash`, and
+panes are non-login shells, so without it every pane would be bash. It is a
+name rather than a path so a static zsh in `~/.local/bin` works too.
 
-The prefix is the one shared value that cannot drift: `herdr/config.toml` sets
-`prefix = "ctrl+backslash"` and `ghostty/config` hardcodes that byte (`0x1c`) in
-every `cmd+…` keybind. Change one and the other stops working.
+The prefix is the one shared value that cannot drift: `herdr/config.local.toml`
+sets `prefix = "ctrl+backslash"` and `ghostty/config` hardcodes that byte
+(`0x1c`) in every `cmd+…` keybind. Change one and the other stops working.
 
 ### Proxies
 

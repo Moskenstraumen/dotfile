@@ -20,7 +20,7 @@ MANIFEST_LOCAL=(
 	"sketchybar|$HOME/.config/sketchybar"
 	"ghostty|$HOME/.config/ghostty"
 	"nvim|$HOME/.config/nvim"
-	"herdr/config.toml|$HOME/.config/herdr/config.toml"
+	"herdr/config.local.toml|$HOME/.config/herdr/config.toml"
 	"karabiner/karabiner.json|$HOME/.config/karabiner/karabiner.json"
 )
 

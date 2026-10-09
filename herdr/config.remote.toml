@@ -2,8 +2,8 @@
 #
 # Presentation settings — [theme], [keys], [ui], copy behaviour — come from the
 # *client's* local config, so they are deliberately absent here: the macOS
-# config.toml already drives the UI over `herdr --remote`, and duplicating it
-# would be two copies to keep in sync.
+# config.local.toml already drives the UI over `herdr --remote`, and duplicating
+# it would be two copies to keep in sync.
 #
 # Only settings that belong to the server where the panes actually run live in
 # this file. herdr man page, "Configuration": pane defaults, worktrees,
@@ -11,10 +11,14 @@
 # client-side.
 
 [terminal]
-# A remote login shell is bash, and herdr starts panes from whatever $SHELL is
-# there rather than from the hand-off in ~/.profile. Point it at zsh directly so
-# every pane picks up ~/.zshrc — the proxy, nvm and the aliases.
-default_shell = "/usr/bin/zsh"
+# Redundant where the bootstrap could chsh: sshd then sets SHELL to zsh and
+# herdr falls back to $SHELL anyway. It matters on boxes that rely on the
+# ~/.profile hand-off. `herdr --remote` starts the server from a
+# non-interactive ssh command, so SHELL is still /bin/bash, and panes start as
+# non-login shells, so the hand-off never fires and every pane would be bash.
+# A name rather than a path, so a static zsh in ~/.local/bin works as well as
+# a system one.
+default_shell = "zsh"
 
 [server]
 # Wider than the 120x40 default: when no client is attached the server lays

@@ -1,5 +1,6 @@
 # Runtime state (socket, logs, locks); only the configs are tracked.
+# config.toml itself is a link onto one of these, made by the bootstrap.
 *
 !.gitignore
-!config.toml
+!config.local.toml
 !config.remote.toml

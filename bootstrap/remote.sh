@@ -171,12 +171,72 @@ if [ "${#failed[@]}" -gt 0 ]; then
 	warn "re-run after setting GITHUB_TOKEN if this was an API rate limit"
 fi
 
-# chsh needs zsh listed in /etc/shells and is refused outright on most
-# LDAP-managed cluster accounts, so hand off from the bash startup file
-# instead. The guard skips non-interactive shells, which is what keeps
-# scp, rsync and `ssh host cmd` working.
-prefer_zsh_at_login() {
-	local target marker block
+HANDOFF_BEGIN="# >>> dotfiles: prefer zsh >>>"
+HANDOFF_END="# <<< dotfiles: prefer zsh <<<"
+
+# Drop the hand-off block, and the blank line written ahead of it, from every
+# bash startup file: which one received it depended on what existed at the
+# time. The result is copied back with cat rather than moved into place, so a
+# startup file that is a symlink stays one and the edit lands in its target.
+remove_zsh_handoff() {
+	local f tmp
+
+	for f in "$HOME/.bash_profile" "$HOME/.bash_login" "$HOME/.profile"; do
+		[ -f "$f" ] && grep -Fxq "$HANDOFF_BEGIN" "$f" || continue
+		tmp="$(mktemp)" || continue
+
+		# A blank line is held back until the next line shows whether it was
+		# the separator in front of the block.
+		awk -v begin="$HANDOFF_BEGIN" -v end="$HANDOFF_END" '
+			$0 == begin { skip = 1; held = 0; next }
+			skip { if ($0 == end) skip = 0; next }
+			held { print ""; held = 0 }
+			$0 == "" { held = 1; next }
+			{ print }
+			END { if (held) print "" }
+		' "$f" > "$tmp" && cat "$tmp" > "$f" &&
+			log "removed the zsh hand-off from $(basename "$f")"
+		rm -f "$tmp"
+	done
+}
+
+# Make zsh the real login shell where that is possible, and fall back to a
+# hand-off from the bash startup file where it is not. Only a real login
+# shell gives `ssh host cmd`, scp and rsync the environment in ~/.zshenv;
+# the hand-off covers interactive logins alone.
+#
+# chsh is only tried as root. For anyone else it prompts for a password in
+# the middle of the bootstrap, and LDAP-managed cluster accounts refuse it
+# outright. It also rejects any shell missing from /etc/shells, which a
+# static build in ~/.local never is.
+ensure_zsh_login_shell() {
+	local zsh_path current="" target block
+
+	zsh_path="$(command -v zsh)" || return 0
+
+	# getent also covers LDAP accounts, which never appear in /etc/passwd.
+	# Without it the current shell is unknown, so carry on as if it were bash.
+	if have getent; then
+		current="$(getent passwd "$(id -un)" | cut -d: -f7)" || current=""
+	fi
+
+	if [ "$(basename "${current:-none}")" = zsh ]; then
+		remove_zsh_handoff
+		log "login shell is already zsh"
+		return 0
+	fi
+
+	if [ "$(id -u)" -eq 0 ] && grep -Fxq "$zsh_path" /etc/shells 2>/dev/null; then
+		if chsh -s "$zsh_path" >/dev/null 2>&1 ||
+			usermod -s "$zsh_path" "$(id -un)" >/dev/null 2>&1; then
+			remove_zsh_handoff
+			log "login shell is now zsh; open a new connection"
+			return 0
+		fi
+		warn "could not change the login shell to $zsh_path"
+	else
+		log "chsh needs root and $zsh_path in /etc/shells; falling back to a bash hand-off"
+	fi
 
 	if [ -f "$HOME/.bash_profile" ]; then
 		target="$HOME/.bash_profile"
@@ -186,16 +246,15 @@ prefer_zsh_at_login() {
 		target="$HOME/.profile"
 	fi
 
-	marker="# >>> dotfiles: prefer zsh >>>"
-	if [ -f "$target" ] && grep -Fq "$marker" "$target"; then
+	if [ -f "$target" ] && grep -Fq "$HANDOFF_BEGIN" "$target"; then
 		log "login shell already hands off to zsh via $(basename "$target")"
-		return
+		return 0
 	fi
 
 	# PATH comes first: everything this profile installs lands in ~/.local/bin,
 	# including zsh itself when it had to be a static build, and a bash login
 	# shell has no reason to be looking there yet.
-	block="$marker
+	block="$HANDOFF_BEGIN
 case \":\$PATH:\" in
 	*\":\$HOME/.local/bin:\"*) ;;
 	*) PATH=\"\$HOME/.local/bin:\$PATH\"; export PATH ;;
@@ -209,14 +268,14 @@ case \$- in
 		fi
 		;;
 esac
-# <<< dotfiles: prefer zsh <<<"
+$HANDOFF_END"
 
 	printf '\n%s\n' "$block" >> "$target"
 	log "added a zsh hand-off to $(basename "$target")"
 }
 
 if [ "$HAVE_ZSH" -eq 1 ]; then
-	prefer_zsh_at_login
+	ensure_zsh_login_shell
 fi
 
 if [ ! -f "$HOME/.config/zsh/secrets.zsh" ]; then

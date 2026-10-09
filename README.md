@@ -171,10 +171,16 @@ bootstrap/Brewfile`.
 
 ## Login shell
 
-`chsh` needs zsh listed in `/etc/shells` and is refused outright on most
-LDAP-managed cluster accounts, so the remote profile appends a guarded
-hand-off to `~/.bash_profile` (or `~/.bash_login`, or `~/.profile` — whichever
-bash would actually read) instead:
+Remotes are meant to be zsh-only: the repo keeps no bash configuration, and
+everything non-interactive shells need lives in `~/.zshenv`. So the remote
+profile makes zsh the real login shell where it can — when it runs as root and
+the `zsh` on `PATH` is listed in `/etc/shells`, it runs `chsh -s` (falling back
+to `usermod -s`). The change applies to new connections only.
+
+`chsh` is never tried as any other user: it prompts for a password mid-bootstrap,
+and most LDAP-managed cluster accounts refuse it outright. On those boxes the
+profile instead appends a guarded hand-off to `~/.bash_profile` (or
+`~/.bash_login`, or `~/.profile` — whichever bash would actually read):
 
 ```sh
 case $- in
@@ -188,8 +194,9 @@ esac
 ```
 
 The `$-` and `-t 1` guards mean it only fires for a real interactive login, so
-`scp`, `rsync` and `ssh host cmd` keep working. It is fenced with markers and
-only appended once.
+`scp`, `rsync` and `ssh host cmd` keep working — but on such a box they run in
+plain bash, without the repo's environment. It is fenced with markers and only
+appended once. Once the login shell is zsh, a later run removes the block again.
 
 ## Pinned versions
 

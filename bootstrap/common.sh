@@ -302,6 +302,10 @@ install_nvm() {
 	# back exactly what is meant to be there, not whatever accumulated.
 	if nvm install "$version" >/dev/null 2>&1; then
 		nvm alias default "$version" >/dev/null 2>&1 || true
+		# Repoints ~/.nvm/current at the default node, so zshenv can put it on
+		# PATH without sourcing nvm.sh. The variable is never exported in a
+		# shell, so only the bootstrap ever moves the link.
+		NVM_SYMLINK_CURRENT=true nvm use default >/dev/null 2>&1 || true
 		log "node $(node --version 2>/dev/null) (pinned to $version) via nvm $tag"
 	else
 		warn "could not install node $version"

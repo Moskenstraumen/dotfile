@@ -24,6 +24,6 @@ palette = 15=#ffffff
 
 # Transparency (per theme; keep these out of the main config).
 background-opacity = 0.5
-background-blur = macos-glass-clear
+background-blur = false
 # Apply the opacity to cells with explicit backgrounds too (omp message/tool blocks).
 background-opacity-cells = true

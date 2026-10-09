@@ -25,6 +25,9 @@ esac
 [[ -f ~/.config/zsh/alias.local.zsh ]]  && source ~/.config/zsh/alias.local.zsh
 [[ -f ~/.config/zsh/secrets.zsh ]]      && source ~/.config/zsh/secrets.zsh
 
+# pi: request the 1 h prompt-cache tier (env-only switch; no settings key).
+export PI_CACHE_RETENTION=long
+
 # zoxide takes over cd itself: plain paths still work, anything else is a
 # frecency jump. `cdi` picks interactively. Directory tab-completion is
 # unaffected; zoxide only adds its own query on Space-Tab.

@@ -11,7 +11,8 @@
 
 MANIFEST_LOCAL=(
 	"starship.toml|$HOME/.config/starship.toml"
-	"zsh/zshrc|$HOME/.config/zsh/zshrc"
+	"zsh/zshrc.local|$HOME/.zshrc"
+	"zsh/zshenv.local|$HOME/.zshenv"
 	"zsh/alias.common.zsh|$HOME/.config/zsh/alias.common.zsh"
 	"zsh/alias.local.zsh|$HOME/.config/zsh/alias.local.zsh"
 	"yabai|$HOME/.config/yabai"
@@ -21,15 +22,14 @@ MANIFEST_LOCAL=(
 	"nvim|$HOME/.config/nvim"
 	"herdr/config.toml|$HOME/.config/herdr/config.toml"
 	"karabiner/karabiner.json|$HOME/.config/karabiner/karabiner.json"
-	"$HOME/.config/zsh/zshrc|$HOME/.zshrc"
 )
 
 MANIFEST_REMOTE=(
 	"starship.toml|$HOME/.config/starship.toml"
-	"zsh/zshrc.remote|$HOME/.config/zsh/zshrc"
+	"zsh/zshrc.remote|$HOME/.zshrc"
+	"zsh/zshenv.remote|$HOME/.zshenv"
 	"zsh/alias.common.zsh|$HOME/.config/zsh/alias.common.zsh"
 	"zsh/alias.remote.zsh|$HOME/.config/zsh/alias.remote.zsh"
 	"herdr/config.remote.toml|$HOME/.config/herdr/config.toml"
 	"nvim|$HOME/.config/nvim"
-	"$HOME/.config/zsh/zshrc|$HOME/.zshrc"
 )

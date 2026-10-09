@@ -1,0 +1,14 @@
+# Environment for every zsh, interactive or not: `zsh -c`, and the shells
+# behind scp, rsync and `ssh host cmd` all read this. It must therefore print
+# nothing and start nothing — whatever runs here runs again for each of them.
+#
+# PATH deliberately stays out of this file. On macOS /etc/zprofile runs
+# path_helper after zshenv, and it reorders PATH for every login shell, so a
+# prepend here comes back in the wrong position. ~/.zshrc sets PATH instead.
+
+# Set once per environment. proxy_on and proxy_off leave it alone.
+export no_proxy="localhost,127.0.0.1,::1,.basemind.com,.zyql.com,.stepfun-inc.com"
+export NO_PROXY="$no_proxy"
+
+# pi: request the 1 h prompt-cache tier (env-only switch; no settings key).
+export PI_CACHE_RETENTION=long

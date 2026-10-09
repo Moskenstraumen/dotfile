@@ -12,7 +12,6 @@ plugins=(
 source $ZSH/oh-my-zsh.sh
 
 export TERM=xterm-256color
-export PATH="$HOME/.local/bin:$PATH"
 
 HISTSIZE=10000
 SAVEHIST=10000
@@ -20,23 +19,14 @@ setopt HIST_IGNORE_ALL_DUPS
 setopt HIST_FIND_NO_DUPS
 setopt INC_APPEND_HISTORY
 
-# Cluster-internal hosts must never go through the proxy. Set once, here.
-# proxy_on and proxy_off leave it alone.
-export no_proxy="10.140.54.27,10.140.70.27,10.0.0.0/8,100.96.0.0/12,172.16.0.0/12,192.168.0.0/16,127.0.0.1,localhost,.basemind.com,.zyql.com,.stepfun-inc.com"
-export NO_PROXY="$no_proxy"
-
-export HF_ENDPOINT='https://hf-mirror.com'
-
-export NVM_DIR="$HOME/.nvm"
+# nvm is a shell function, so it still has to be sourced here; the default
+# node's PATH entry comes from ~/.nvm/current in zshenv.remote.
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 [[ -f ~/.config/zsh/alias.common.zsh ]] && source ~/.config/zsh/alias.common.zsh
 [[ -f ~/.config/zsh/alias.remote.zsh ]] && source ~/.config/zsh/alias.remote.zsh
 [[ -f ~/.config/zsh/secrets.zsh ]]      && source ~/.config/zsh/secrets.zsh
-
-# pi: request the 1 h prompt-cache tier (env-only switch; no settings key).
-export PI_CACHE_RETENTION=long
 
 # zoxide takes over cd itself: plain paths still work, anything else is a
 # frecency jump. `cdi` picks interactively. Directory tab-completion is

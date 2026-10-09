@@ -36,18 +36,26 @@ bootstrap/
 ### Adding a config
 
 Put the files in the repo, then add a `"source|target"` line to the right array
-in `bootstrap/manifest.sh`. There is no shared list: `MANIFEST_LOCAL` and
-`MANIFEST_REMOTE` each enumerate their environment in full, so a file that
-belongs on both is listed twice. Reading either array tells you exactly what
-that machine gets.
+in `bootstrap/manifest.sh`. Files are named `<name>.<profile>[.<ext>]` —
+`alias.local.zsh`, `config.remote.toml`, `zshrc.remote` — where **local** means
+this Mac only and **remote** means any remote server, so nothing
+machine-specific may sit in a `.remote` file. There is no shared list:
+`MANIFEST_LOCAL` and `MANIFEST_REMOTE` each enumerate their environment in
+full, so a file that belongs on both is listed twice. Reading either array tells
+you exactly what that machine gets.
 
 ## What goes where
+
+Each file is linked straight onto the name its shell reads, so there is no
+intermediate `~/.config/zsh/zshrc` hop any more.
 
 | | local | remote |
 |---|---|---|
 | `starship.toml` | yes | yes |
-| `zsh/zshrc` | yes | — |
-| `zsh/zshrc.remote` | — | yes (linked as `zsh/zshrc`) |
+| `zsh/zshrc.local` | yes, as `~/.zshrc` | — |
+| `zsh/zshenv.local` | yes, as `~/.zshenv` | — |
+| `zsh/zshrc.remote` | — | yes, as `~/.zshrc` |
+| `zsh/zshenv.remote` | — | yes, as `~/.zshenv` |
 | `zsh/alias.common.zsh` | yes | yes |
 | `zsh/alias.local.zsh` | yes | — |
 | `zsh/alias.remote.zsh` | — | yes |
@@ -61,6 +69,21 @@ automatically when something is listening on 7890 (Clash locally, sing-box or
 a forwarded tunnel on a remote), but they probe it differently — `nc` on macOS,
 `ztcp` on remotes where `nc` may be missing — and only the local one carries the
 workstation's `ssh` shortcuts.
+
+### zshenv and zshrc
+
+`zshenv` is read by every zsh — interactive or not — which on a remote box means
+`scp`, `rsync` and `ssh host cmd` get the proxy variables, `HF_ENDPOINT` and the
+rest without anything being sourced. That is also why it must print nothing and
+start nothing: an escape sequence or a prompt written there lands in the output
+of every non-interactive command. `zshrc` is the interactive half (oh-my-zsh,
+nvm, aliases, zoxide, fzf, starship) and is never read by those shells.
+
+PATH stays in `zshrc.local` locally even though it would fit in a zshenv:
+macOS runs `path_helper` from `/etc/zprofile` *after* zshenv, and for login
+shells it rebuilds PATH from `/etc/paths`, dropping anything prepended earlier.
+On a remote box there is no `path_helper`, so `zshenv.remote` sets `path`
+itself — which is what puts node on PATH without sourcing nvm.sh.
 
 ### herdr
 
@@ -84,9 +107,9 @@ every `cmd+…` keybind. Change one and the other stops working.
 
 ### Proxies
 
-`no_proxy` is set once per environment in the zshrc — loopback locally, the
-cluster ranges on remote — and neither `proxy_on` nor `proxy_off` touches it.
-Only the `http(s)_proxy` variables are toggled. Both lists also carry the
+`no_proxy` is set once per environment in that profile's zshenv — loopback
+locally, the cluster ranges on remote — and neither `proxy_on` nor `proxy_off`
+touches it: only the `http(s)_proxy` variables are toggled. Both lists also carry the
 company domains `.basemind.com`, `.zyql.com` and `.stepfun-inc.com`: they answer
 only direct connections, so routing them through 7890 makes requests to them —
 including every model request — time out.

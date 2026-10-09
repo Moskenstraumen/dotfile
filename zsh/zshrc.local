@@ -7,10 +7,6 @@ plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
-# Set once, here. proxy_on and proxy_off leave it alone.
-export no_proxy="localhost,127.0.0.1,::1,.basemind.com,.zyql.com,.stepfun-inc.com"
-export NO_PROXY="$no_proxy"
-
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
@@ -24,9 +20,6 @@ esac
 [[ -f ~/.config/zsh/alias.common.zsh ]] && source ~/.config/zsh/alias.common.zsh
 [[ -f ~/.config/zsh/alias.local.zsh ]]  && source ~/.config/zsh/alias.local.zsh
 [[ -f ~/.config/zsh/secrets.zsh ]]      && source ~/.config/zsh/secrets.zsh
-
-# pi: request the 1 h prompt-cache tier (env-only switch; no settings key).
-export PI_CACHE_RETENTION=long
 
 # zoxide takes over cd itself: plain paths still work, anything else is a
 # frecency jump. `cdi` picks interactively. Directory tab-completion is

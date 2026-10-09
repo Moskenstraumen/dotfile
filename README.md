@@ -56,9 +56,11 @@ that machine gets.
 | `herdr/config.remote.toml` | — | yes (linked as `herdr/config.toml`) |
 
 The window manager, status bar and terminal are macOS-only and never reach a
-remote box. The alias split matters: `alias.local.zsh` turns the proxy on
-automatically when Clash is listening on 7890, which must not happen on a
-cluster node.
+remote box. The alias split matters: both alias files turn the proxy on
+automatically when something is listening on 7890 (Clash locally, sing-box or
+a forwarded tunnel on a remote), but they probe it differently — `nc` on macOS,
+`ztcp` on remotes where `nc` may be missing — and only the local one carries the
+workstation's `ssh` shortcuts.
 
 ### herdr
 
@@ -84,7 +86,10 @@ every `cmd+…` keybind. Change one and the other stops working.
 
 `no_proxy` is set once per environment in the zshrc — loopback locally, the
 cluster ranges on remote — and neither `proxy_on` nor `proxy_off` touches it.
-Only the `http(s)_proxy` variables are toggled.
+Only the `http(s)_proxy` variables are toggled. Both lists also carry the
+company domains `.basemind.com`, `.zyql.com` and `.stepfun-inc.com`: they answer
+only direct connections, so routing them through 7890 makes requests to them —
+including every model request — time out.
 
 ## Tools
 

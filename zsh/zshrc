@@ -8,7 +8,7 @@ plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
 source $ZSH/oh-my-zsh.sh
 
 # Set once, here. proxy_on and proxy_off leave it alone.
-export no_proxy="localhost,127.0.0.1,::1"
+export no_proxy="localhost,127.0.0.1,::1,.basemind.com,.zyql.com,.stepfun-inc.com"
 export NO_PROXY="$no_proxy"
 
 export NVM_DIR="$HOME/.nvm"

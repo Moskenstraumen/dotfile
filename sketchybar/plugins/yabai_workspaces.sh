@@ -6,7 +6,6 @@ app_icon() {
     Safari)                          echo "󰀹" ;;
     Firefox | "Firefox Developer Edition") echo "󰈹" ;;
     "Google Chrome")                 echo "" ;;
-    ChatGPT)                          echo "" ;;
     Brave*)                          echo "󰖟" ;;
     "Microsoft Edge")                echo "󰇩" ;;
 
@@ -70,7 +69,7 @@ app_icon() {
 
 app_font() {
   case "$1" in
-    "Google Chrome"|ChatGPT|Zed|Zotero|Obsidian|Terminal|Feishu|Lark|kitty|Ghostty) echo "sketchybar-app-font:Regular:13.0" ;;
+    "Google Chrome"|Zed|Zotero|Obsidian|Terminal|Feishu|Lark|kitty|Ghostty) echo "sketchybar-app-font:Regular:13.0" ;;
     *) echo "Maple Mono NF CN:Medium:13.0" ;;
   esac
 }

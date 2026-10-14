@@ -94,7 +94,6 @@ set_gaps() {
 # Rules resolve labels to indexes when added, so rerun this after spaces move;
 # a rule label replaces the previous rule instead of piling up a new one
 apply_rules() {
-  yabai -m rule --add label=to-chatgpt app="^ChatGPT$" space=work
   yabai -m rule --add label=to-ghostty app="^Ghostty$" space=work
   yabai -m rule --add label=to-chrome app="^Google Chrome$" space=brow
   yabai -m rule --add label=to-zotero app="^Zotero$" space=paper

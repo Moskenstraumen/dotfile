@@ -41,10 +41,6 @@ brew "felixkratz/formulae/sketchybar", trusted: true
 cask "betterdisplay"
 # Utility improving 3rd party mouse performance and functionalities
 cask "bettermouse"
-# OpenAI's official ChatGPT desktop app
-cask "chatgpt"
-# Terminal-based AI coding assistant
-cask "claude-code@latest"
 # Web browser
 cask "google-chrome"
 # Project management software

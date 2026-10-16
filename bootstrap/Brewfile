@@ -29,8 +29,6 @@ brew "uv"
 brew "zoxide"
 # Parser generator tool (LazyVim builds treesitter parsers with it)
 brew "tree-sitter-cli"
-# UNIX shell (command interpreter)
-brew "zsh"
 # Simple hotkey-daemon for macOS.
 brew "asmvik/formulae/skhd", trusted: true
 # A tiling window manager for macOS based on binary space partitioning.

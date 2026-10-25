@@ -11,8 +11,8 @@ name = "terminal"
 panel_bg = "reset"
 
 [keys]
-# ctrl+b is tmux's prefix; ctrl+\ (SIGQUIT) is unused in daily work.
-prefix = "ctrl+backslash"
+# The prefix stays at herdr's default ctrl+b; Ghostty sends that byte (0x02)
+# ahead of each action key in ghostty/config.
 # Plain-character keys Ghostty can send as text (see ghostty/config); escape-based
 # sequences like alt+digit or shift+tab don't survive the trip.
 cycle_pane_previous = "prefix+semicolon"

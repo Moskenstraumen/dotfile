@@ -1,5 +1,5 @@
--- Match Ghostty's glass-dark theme (ghostty/themes/glass-dark). The
--- background stays transparent so Ghostty's opacity and blur show through.
+-- Transparent dark palette for a glass-effect terminal: background stays
+-- transparent so the terminal's opacity and blur show through.
 return {
   {
     "folke/tokyonight.nvim",

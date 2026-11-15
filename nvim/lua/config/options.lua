@@ -7,7 +7,7 @@ vim.opt.relativenumber = false
 -- Over SSH, LazyVim leaves the clipboard off because the remote box has no
 -- system clipboard. Yank to the local one through the terminal with OSC 52
 -- instead. Paste reads the unnamed register rather than asking the terminal,
--- which would make Ghostty prompt on every p; use Cmd+V for the Mac clipboard.
+-- which would make the terminal prompt on every p; use Cmd+V for the Mac clipboard.
 if vim.env.SSH_CONNECTION then
   local osc52 = require("vim.ui.clipboard.osc52")
   local function paste()

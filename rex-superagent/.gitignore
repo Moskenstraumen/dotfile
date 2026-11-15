@@ -1,0 +1,12 @@
+*
+!.gitignore
+!/hosts/
+!/hosts/*.bootstrap.json
+!/pi/
+!/pi/agent/
+!/pi/agent/settings.json
+!/pi/agent/web-search.json
+!/pi/agent/agents/
+!/pi/agent/agents/reader.md
+!/pi/agent/agents/thinker.md
+!/pi/agent/agents/implementer.md

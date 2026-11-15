@@ -1,0 +1,172 @@
+{
+  "app": {
+    "hostId": "mac",
+    "configDir": "/Users/moskenstraumen/.config/rex-superagent",
+    "dataDir": "/Users/moskenstraumen/.local/share/rex-superagent",
+    "stateDir": "/Users/moskenstraumen/.local/state/rex-superagent",
+    "cacheDir": "/Users/moskenstraumen/.cache/rex-superagent",
+    "runtimeDir": "/private/tmp/rex-superagent",
+    "memoryDir": "/Users/moskenstraumen/.pi/memory",
+    "hosts": [
+      {
+        "id": "mac",
+        "cwd": "/Users/moskenstraumen/Documents/Work/step"
+      },
+      {
+        "id": "ali",
+        "sshTarget": "ali",
+        "command": "/root/.nvm/current/bin/node /mnt/cpfs/xuyucheng-fileset/projects/rex-superagent/dist/cli.js peer-bridge --config /root/.config/rex-superagent/bootstrap.json",
+        "cwd": "/mnt/cpfs/xuyucheng-fileset"
+      },
+      {
+        "id": "stepmind",
+        "sshTarget": "stepmind",
+        "command": "/home/xuyucheng/.nvm/current/bin/node /data/projects/rex-superagent/dist/cli.js peer-bridge --config /home/xuyucheng/.config/rex-superagent/bootstrap.json",
+        "cwd": "/data/projects"
+      }
+    ],
+    "models": {
+      "main": {
+        "provider": "cliproxyapi",
+        "model": "gemini-4-hydrogen-xhigh",
+        "thinkingLevel": "high"
+      },
+      "executor": {
+        "provider": "modelproxy",
+        "model": "gpt-6.1-sol-coding",
+        "thinkingLevel": "high"
+      },
+      "maintenance_reviewer": {
+        "provider": "modelproxy",
+        "model": "claude-opus-5.5",
+        "thinkingLevel": "medium"
+      }
+    },
+    "sessionRetentionDays": 30
+  },
+  "globalAgentDir": "/Users/moskenstraumen/.local/share/rex-superagent/pi/agent",
+  "operator": {
+    "operatorId": "xuyucheng",
+    "hostIds": [
+      "mac",
+      "ali",
+      "stepmind"
+    ],
+    "capabilities": [
+      "publish"
+    ],
+    "enrollment": "create-if-absent"
+  },
+  "rex": {
+    "binary": "/Applications/Rex Beta.app/Contents/Helpers/Rex Server.rex/Contents/MacOS/rex",
+    "sessionId": "rex-superagent",
+    "nodePath": "/Users/moskenstraumen/.nvm/versions/node/v22.20.0/bin/node",
+    "ownerEntry": "/Users/moskenstraumen/Documents/Work/step/projects/rex-superagent/dist/pi/owner-entry.js"
+  },
+  "extensionAllowlist": {
+    "paths": [],
+    "builtinExtensions": []
+  },
+  "roleExtensions": {
+    "extensions": [
+      {
+        "id": "pi-web-access",
+        "entryPath": "/Users/moskenstraumen/.local/share/rex-superagent/pi/agent/npm/node_modules/pi-web-access",
+        "roles": [
+          "executor"
+        ],
+        "expectedTools": [
+          "web_search",
+          "source_check",
+          "fetch_content",
+          "get_search_content"
+        ],
+        "exposure": "direct",
+        "config": {
+          "path": "/Users/moskenstraumen/.local/share/rex-superagent/pi/agent/web-search.json"
+        }
+      },
+      {
+        "id": "pi-background",
+        "entryPath": "/Users/moskenstraumen/.local/share/rex-superagent/pi/agent/npm/node_modules/pi-background",
+        "roles": [
+          "executor"
+        ],
+        "expectedTools": [
+          "bg_run",
+          "bg_status",
+          "bg_kill"
+        ],
+        "exposure": "direct"
+      },
+      {
+        "id": "pi-subagents",
+        "entryPath": "/Users/moskenstraumen/.local/share/rex-superagent/pi/agent/npm/node_modules/@tintinweb/pi-subagents",
+        "roles": [
+          "executor"
+        ],
+        "expectedTools": [
+          "Agent",
+          "get_subagent_result",
+          "steer_subagent"
+        ],
+        "exposure": "direct"
+      },
+      {
+        "id": "pi-cliproxyapi-provider",
+        "entryPath": "/Users/moskenstraumen/.local/share/rex-superagent/pi/agent/npm/node_modules/@router-for-me/pi-cliproxyapi-provider/extensions/index.ts",
+        "roles": [
+          "main",
+          "executor",
+          "maintenance_reviewer"
+        ],
+        "expectedTools": [],
+        "exposure": "direct"
+      },
+      {
+        "id": "list-models",
+        "entryPath": "/Users/moskenstraumen/.local/share/rex-superagent/pi/agent/extensions/list-models.ts",
+        "roles": [
+          "main",
+          "executor",
+          "maintenance_reviewer"
+        ],
+        "expectedTools": [],
+        "exposure": "direct"
+      },
+      {
+        "id": "session-cleanup",
+        "entryPath": "/Users/moskenstraumen/.local/share/rex-superagent/pi/agent/extensions/session-cleanup.ts",
+        "roles": [
+          "main",
+          "executor",
+          "maintenance_reviewer"
+        ],
+        "expectedTools": [],
+        "exposure": "direct"
+      },
+      {
+        "id": "pi-starline",
+        "entryPath": "/Users/moskenstraumen/.local/share/rex-superagent/pi/agent/npm/node_modules/pi-starline/extensions/starline/index.ts",
+        "roles": [
+          "main",
+          "executor",
+          "maintenance_reviewer"
+        ],
+        "expectedTools": [],
+        "exposure": "direct"
+      },
+      {
+        "id": "pi-tidy",
+        "entryPath": "/Users/moskenstraumen/.local/share/rex-superagent/pi/agent/npm/node_modules/pi-tidy/index.ts",
+        "roles": [
+          "main",
+          "executor",
+          "maintenance_reviewer"
+        ],
+        "expectedTools": [],
+        "exposure": "direct"
+      }
+    ]
+  }
+}

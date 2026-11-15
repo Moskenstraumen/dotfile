@@ -1,0 +1,20 @@
+# Only declarative config belongs in this tree; credentials and runtime state stay local.
+*
+!.gitignore
+!/agent/
+!/agent/AGENTS.md
+!/agent/models.json
+!/agent/settings.json
+!/agent/starline.json
+!/agent/subagents.json
+!/agent/web-search.json
+!/agent/agents/
+!/agent/agents/reader.md
+!/agent/agents/thinker.md
+!/agent/agents/implementer.md
+!/agent/extensions/
+!/agent/extensions/list-models.ts
+!/agent/extensions/session-cleanup.ts
+!/agent/skills/
+!/agent/skills/rex/
+!/agent/skills/rex/SKILL.md

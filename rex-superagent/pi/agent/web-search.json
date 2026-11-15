@@ -1,0 +1,5 @@
+{
+  "workflow": "none",
+  "toolActivation": "eager",
+  "toolExposure": "direct"
+}

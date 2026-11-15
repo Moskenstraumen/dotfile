@@ -1,0 +1,35 @@
+{
+  "pill": {
+    "segments": [
+      "model",
+      "thinking",
+      "cwd",
+      "git",
+      "sessionName",
+      "context"
+    ]
+  },
+  "pathDisplay": {
+    "mode": "full",
+    "depth": 2
+  },
+  "colorSources": {
+    "starship": "terminal",
+    "editor": "terminal"
+  },
+  "colors": {
+    "cwd": "bold cyan",
+    "gitBranch": "bold purple",
+    "sessionName": "bold green"
+  },
+  "icons": {
+    "mode": "nerd",
+    "git": ""
+  },
+  "extensionStatuses": {
+    "defaultPlacement": "off"
+  },
+  "features": {
+    "copyFriendly": true
+  }
+}

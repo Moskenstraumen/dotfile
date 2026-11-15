@@ -1,0 +1,12 @@
+{
+  "disableDefaultAgents": true,
+  "toolDescriptionMode": "compact",
+  "fallbackSubagent": "none",
+  "outputTranscript": false,
+  "reportUsage": true,
+  "showCost": true,
+  "showModel": true,
+  "schedulingEnabled": false,
+  "worktreeIsolation": false,
+  "workflowsEnabled": false
+}

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Entry point for both environments.
+# Entry point for both environments, including Pi installation and configuration.
 #
-#   ./setup.sh          pick the profile from the OS
-#   ./setup.sh local    macOS workstation (Homebrew, window manager, Ghostty)
-#   ./setup.sh remote   no-root box: binaries into ~/.local/bin only
+#   ./setup.sh                       auto: local on macOS, remote elsewhere
+#   bash setup.sh --local  (or local) macOS workstation (Homebrew, window manager)
+#   bash setup.sh --remote (or remote) no-root box: tools under $HOME
 #
 # The repo root is derived from this script, so the checkout can live
 # anywhere on either side.
@@ -13,15 +13,20 @@ DOTFILES_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 export DOTFILES_ROOT
 
 usage() {
-	sed -n '2,9p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'
+	printf '%s\n' \
+		'Usage: bash setup.sh [auto|local|--local|remote|--remote]' \
+		'  auto (default): macOS -> local, everything else -> remote' \
+		'Installs tools and Pi, then links configuration for the selected profile.'
 }
 
+[ "$#" -le 1 ] || { usage >&2; exit 1; }
 profile="${1:-auto}"
 case "$profile" in
 	auto)
 		if [ "$(uname -s)" = "Darwin" ]; then profile=local; else profile=remote; fi
 		;;
-	local|remote) ;;
+	local|--local) profile=local ;;
+	remote|--remote) profile=remote ;;
 	-h|--help|help) usage; exit 0 ;;
 	*) usage >&2; exit 1 ;;
 esac

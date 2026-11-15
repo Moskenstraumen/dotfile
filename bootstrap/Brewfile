@@ -60,5 +60,6 @@ cask "wechat"
 # Collect, organise, cite, and share research sources
 cask "zotero"
 npm "@larksuite/cli"
+npm "@earendil-works/pi-coding-agent"
 npm "corepack"
 npm "pnpm"

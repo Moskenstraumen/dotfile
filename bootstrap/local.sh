@@ -78,6 +78,12 @@ install_zsh_framework
 log "linking configuration"
 apply_manifest "${MANIFEST_LOCAL[@]}"
 
+if ! have pi && have npm; then
+	log "installing Pi"
+	npm install -g @earendil-works/pi-coding-agent || warn "could not install pi"
+fi
+bash "$DOTFILES_ROOT/bootstrap/pi.sh" auto || warn "could not finish Pi configuration"
+
 # yabai and skhd manage their own launchd services and the taps shipping them
 # provide no brew service file, so `brew services restart` fails on both with
 # "has not implemented #plist". sketchybar is the opposite: no --restart-service

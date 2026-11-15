@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 # Bootstrap a remote box (login node, VPS, container) with no root access.
 #
-# Everything lands under $HOME/.local, and every tool is fetched as a
-# prebuilt release binary rather than compiled, so this stays usable on a
-# shared node with no toolchain and a strict time budget.
+# Most tools are prebuilt release binaries under $HOME/.local; Node and Pi
+# use the user's nvm tree, so no toolchain or root privileges are required.
 set -euo pipefail
 
 : "${DOTFILES_ROOT:?run this through setup.sh}"
@@ -158,6 +157,27 @@ install_release_binary tree-sitter/tree-sitter tree-sitter \
 
 log "installing nvm and node ${NODE_VERSION}"
 install_nvm || failed+=(nvm)
+
+# install_nvm exports this exact NVM_DIR and selects its default Node in this
+# shell. Reuse current/bin, or load an existing install if the network failed.
+export NVM_DIR="$HOME/.nvm"
+if [ -x "$NVM_DIR/current/bin/node" ]; then
+	export PATH="$NVM_DIR/current/bin:$PATH"
+elif [ -s "$NVM_DIR/nvm.sh" ]; then
+	. "$NVM_DIR/nvm.sh"
+	nvm use default >/dev/null 2>&1 || warn "could not select nvm's default node"
+fi
+
+if ! have pi; then
+	if have npm; then
+		log "installing Pi"
+		npm install -g @earendil-works/pi-coding-agent || failed+=(pi)
+	else
+		warn "npm is unavailable; could not install pi"
+		failed+=(pi)
+	fi
+fi
+bash "$DOTFILES_ROOT/bootstrap/pi.sh" auto || failed+=(pi-config)
 
 # Pull plugins at the versions pinned in nvim/lazy-lock.json, so every box
 # runs exactly what the workstation does. Mason tools are left to :Mason.

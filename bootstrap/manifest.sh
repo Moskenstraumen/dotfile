@@ -18,9 +18,7 @@ MANIFEST_LOCAL=(
 	"yabai|$HOME/.config/yabai"
 	"skhd|$HOME/.config/skhd"
 	"sketchybar|$HOME/.config/sketchybar"
-	"ghostty|$HOME/.config/ghostty"
 	"nvim|$HOME/.config/nvim"
-	"herdr/config.local.toml|$HOME/.config/herdr/config.toml"
 	"karabiner/karabiner.json|$HOME/.config/karabiner/karabiner.json"
 )
 
@@ -30,6 +28,5 @@ MANIFEST_REMOTE=(
 	"zsh/zshenv.remote|$HOME/.zshenv"
 	"zsh/alias.common.zsh|$HOME/.config/zsh/alias.common.zsh"
 	"zsh/alias.remote.zsh|$HOME/.config/zsh/alias.remote.zsh"
-	"herdr/config.remote.toml|$HOME/.config/herdr/config.toml"
 	"nvim|$HOME/.config/nvim"
 )

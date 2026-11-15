@@ -29,5 +29,4 @@ command -v zoxide >/dev/null && eval "$(zoxide init zsh --cmd cd)"
 # Ctrl-R history search, Ctrl-T file insert, Alt-C directory jump.
 command -v fzf >/dev/null && eval "$(fzf --zsh)"
 
-
 eval "$(starship init zsh)"

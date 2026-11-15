@@ -28,8 +28,7 @@ bootstrap/
   remote.sh            no-root: prebuilt binaries into ~/.local/bin
   Brewfile             the macOS package set
 zsh/                   zshenv, zshrc and alias splits
-ghostty/ skhd/ yabai/ sketchybar/ karabiner/   macOS window and terminal setup
-herdr/                 multiplexer config, one file per profile
+skhd/ yabai/ sketchybar/ karabiner/   macOS window setup
 nvim/                  LazyVim config and lazy-lock.json
 starship.toml          prompt
 ```

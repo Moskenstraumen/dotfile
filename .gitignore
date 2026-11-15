@@ -16,7 +16,6 @@ GPATH
 gh/
 mole/
 karabiner/*backups/
-.claude/
 
 # zsh runtime state
 zsh/.zsh_sessions/
@@ -27,6 +26,3 @@ zsh/*.zwc*
 
 # Secrets are sourced if present; only the example is tracked
 zsh/secrets.zsh
-
-# no longer managed here
-zed/

@@ -37,9 +37,18 @@ MANIFEST_REMOTE=(
 
 # Declarative leaves only; credentials, installed packages and runtime state stay local.
 MANIFEST_PI_INTERACTIVE=(
+	"pi/agent/mcp/agy-bridge.mjs|$HOME/.pi/agent/mcp/agy-bridge.mjs"
+	"pi/agent/lib/agy-bridge/controller.ts|$HOME/.pi/agent/lib/agy-bridge/controller.ts"
+	"pi/agent/lib/agy-bridge/history.ts|$HOME/.pi/agent/lib/agy-bridge/history.ts"
+	"pi/agent/lib/agy-bridge/ledger.ts|$HOME/.pi/agent/lib/agy-bridge/ledger.ts"
+	"pi/agent/lib/agy-bridge/ownership.ts|$HOME/.pi/agent/lib/agy-bridge/ownership.ts"
+	"pi/agent/lib/agy-bridge/protocol.mjs|$HOME/.pi/agent/lib/agy-bridge/protocol.mjs"
+	"pi/agent/lib/agy-bridge/rpc.ts|$HOME/.pi/agent/lib/agy-bridge/rpc.ts"
+	"pi/agent/lib/agy-bridge/runner.ts|$HOME/.pi/agent/lib/agy-bridge/runner.ts"
 	"pi/agent/models.json|$HOME/.pi/agent/models.json"
 	"pi/agent/starline.json|$HOME/.pi/agent/starline.json"
 	"pi/agent/subagents.json|$HOME/.pi/agent/subagents.json"
+	"pi/agent/extensions/agy-bridge.ts|$HOME/.pi/agent/extensions/agy-bridge.ts"
 	"pi/agent/extensions/list-models.ts|$HOME/.pi/agent/extensions/list-models.ts"
 	"pi/agent/extensions/session-cleanup.ts|$HOME/.pi/agent/extensions/session-cleanup.ts"
 	"pi/agent/AGENTS.md|$HOME/.pi/agent/AGENTS.md"

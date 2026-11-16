@@ -47,7 +47,9 @@ pi/
     subagents.json     shared subagent configuration
     web-search.json    interactive web access
     agents/            caller-oriented reader, thinker and implementer prompts
-    extensions/        shared list-models.ts and session-cleanup.ts
+    extensions/        agy-bridge.ts (interactive), plus shared list-models.ts and session-cleanup.ts
+    mcp/               agy-bridge.mjs stdio MCP adapter
+    lib/agy-bridge/     session ownership, history, runner, ledger and RPC (outside autoload)
     skills/rex/SKILL.md managed guide stub for the installed Rex CLI
 rex-superagent/
   .gitignore                 allows hosts/ and pi/agent/; ignores runtime copies/backups
@@ -90,11 +92,35 @@ bootstrap config; `interactive` selects that mode explicitly. Explicit host name
 require a regular host config. An inherited `PI_CODING_AGENT_DIR` is warned about
 and unset so a Pi terminal cannot redirect or abort setup.
 
+### Native agy bridge
+
+`extensions/agy-bridge.ts` exposes agy models through `/model`. Use `/agy-mode
+[on|off|status]`, `/agy-model <model> [effort]` and `/agy-effort <effort>` to
+select the transport. `/agy-stop` cancels only its owned CLI process; Enter
+while busy queues a next-turn follow-up. `/agy-new` seeds the next native
+conversation with the complete current effective Pi history. Tree/fork,
+compaction, failed turns or changed native/context checkpoints require that
+explicit reset. The verified `-p` transport is bounded at 96 KiB and never
+silently truncates history.
+
+Configure agy’s `pi-bridge` MCP server to run `node
+~/.pi/agent/mcp/agy-bridge.mjs`. Pi supplies a private endpoint per turn;
+standalone agy advertises no bridge tools. Subagent status/wait are
+nonconsuming, launch timeouts remain unknown, and completion notices are
+best effort. Host-local completion ledgers live under the active agent
+directory’s `agy-bridge/`; pending raw results survive reload. An unreleased
+owner lock blocks reuse until its prior owner is verified and the lock
+retired. Native tools appear as one read-only observer per planner batch,
+with unassociated results and unknown individual outcomes. Terminal native
+token counters are counted once per run; cost and cache/reasoning accounting
+semantics remain explicitly unknown.
+
 ### Shared config, isolated agent directories
 
 - `pi/agent/` mirrors the interactive runtime `~/.pi/agent`. It holds shared
   `models.json`, `starline.json`, `subagents.json`, and the
-  `extensions/list-models.ts` and `extensions/session-cleanup.ts` extensions.
+  `extensions/list-models.ts` and `extensions/session-cleanup.ts` extensions,
+  plus interactive `extensions/agy-bridge.ts` and `mcp/agy-bridge.mjs`.
 - Interactive `pi/agent/AGENTS.md`, settings, web-search config and `agents/`
   supply instructions, web access and caller-oriented `reader`, `thinker` and
   `implementer` prompts. Web tools activate automatically with deferred exposure;

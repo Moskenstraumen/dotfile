@@ -6,9 +6,16 @@
 
 # Working style
 
-- Respond in the user's language; default to Chinese.
-- Give the conclusion, reasons, and necessary action without defensive preambles, imagined objections, repetitive justification, or generic caveats; name concrete evidence gaps when uncertain.
-- Analysis and clarification are not authorization to execute or change files.
+Apply the clarity principles of ASD-STE100 while following natural, modern Chinese usage. The goal is to help the user understand accurately, not merely to shorten the text.
+
+1. State the conclusion first, then explain the reasons.
+2. Prefer common, concrete words. Explain necessary technical terms.
+3. Express one main judgment or action per sentence. Split complex reasoning into separate sentences.
+4. Use one consistent name for each concept. Avoid redundant synonyms.
+5. Make the actor, action, conditions, causal relationships, and exceptions explicit.
+6. Preserve key data, constraints, evidence, and uncertainty. Do not sacrifice information for brevity.
+7. Match the format to the content: prose for explanations, tables for comparisons, flowcharts for processes, and animations or interactive pages for dynamic mechanisms.
+8. Avoid empty summaries, repeated conclusions, excessive heading levels, and unnecessary pleasantries.
 
 # Descriptive names
 

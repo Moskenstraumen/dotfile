@@ -1,43 +1,47 @@
-# Hosts and routing
+# Working style
 
-- `mac` (`/Users/moskenstraumen/Documents/Work/step`): full network reachability; local configuration and cross-host file synchronization.
-- `ali` (`/mnt/cpfs/xuyucheng-fileset`): training and data.
-- `stepmind` (`/data/projects`): deployment and evaluation.
-- Run cross-host inspection and operations over `ssh <host>` inside subagents, pairing commands or waits over ~30s with `bg_run` to keep sessions responsive and raw output out of main context.
+- Respond in the user's language; default to Chinese.
+- Give the conclusion, reasons, and necessary action without defensive preambles, imagined objections, repetitive justification, or generic caveats; name concrete evidence gaps when uncertain.
+- Analysis and clarification are not authorization to execute or change files.
 
-# Project memory
+# Descriptive names
 
-Read this host's `~/.pi/memory/<project-id>/MEMORY.md` and matching entry files with `read` before assuming host/project paths or conventions:
+- Name by purpose or responsibility, without arbitrary numbered labels or invented version suffixes; preserve actual external names and IDs.
 
-- `mac`: `Users__moskenstraumen__Documents__Work__step`
-- `ali`: `mnt__cpfs__xuyucheng-fileset`
-- `stepmind`: `data__projects`
+# Subagents
 
-Each Pi session reads its own host's memory, and cross-host tasks read the target host's `~/.pi/memory/<project-id>/MEMORY.md` over `ssh <host>` before assuming remote paths or conventions. Keep `~/.pi/memory/` read-only; `rex-superagent` maintenance owns writes.
+- Keep the main session on reasoning, user clarification, and orchestration; delegate exploration, CLI/SSH evidence, and execution.
+- Use `reader` for provenance-backed evidence, `thinker` for independent analysis without edits, and `implementer` for settled changes and execution.
+- Run cross-host work over `ssh <host>` inside subagents; use `bg_run` for commands or waits longer than about 30 seconds.
+- Give self-contained, scoped prompts with required context and verification; resume an agent only for related context and leave delegated work to it.
+- Parallelize independent work; concurrent implementers in one directory must have non-overlapping file assignments.
+- Batch independent tool calls and filter large outputs with `codemode` inside the executing agent.
+- Verify actual diffs and verification output after implementation, not just agent summaries.
+- Pass both Change boundaries rules below verbatim into every `implementer` prompt.
 
-# Git worktrees
+# Git workflow
 
-- Isolate the whole task/session in `~/.local/state/rex-superagent/work/<name>` on branch `agent/<name>`; use a name matching `^[a-z0-9][a-z0-9._-]{0,80}$` to follow the `rex-superagent` layout.
-- Base it on `git -C <repo> symbolic-ref --short HEAD`; ask if HEAD is detached, otherwise create it with `git -C <repo> worktree add -b agent/<name> ~/.local/state/rex-superagent/work/<name> <base>` to preserve the checked-out branch's starting point.
-- When `.gitmodules` exists, initialize submodules from the main checkout's local gitdirs with `git -c protocol.file.allow=always -c submodule.<submod>.url=<gitdir> submodule update --init <path>` in the worktree, keeping initialization local without network fetches.
-- Once a change in the worktree is verified, commit it locally on `agent/<name>` without asking, so the task result exists as a reviewable commit instead of loose working-tree edits.
-- Merge `agent/<name>` into its base branch in the main checkout (`git -C <repo> merge agent/<name>`) when the user asks to merge/合入, or asks to use the change outside the worktree (submit/restart experiments, take code snapshots, deploy, evaluate), so such actions always run from the base branch checkout, never from the worktree.
-- Before merging, check `git -C <repo> status`; if the main checkout has uncommitted changes touching the same files or the merge conflicts, stop and ask instead of stashing, overwriting, or resolving on the user's behalf.
-- When finishing a task without merging, state the branch, commit, and worktree path, and ask whether to merge, so integration is never left implicit.
-- After merge or explicit discard, clean up with `git -C <repo> worktree remove --force <dir>`, `git -C <repo> branch -D agent/<name>`, and `git -C <repo> worktree prune` to remove both checkout and references.
-- Push only when explicitly asked, preserving the user's control over remotes.
+- Isolate each task/session in one worktree on `agent/<name>`, based on the main checkout's current symbolic branch; ask if HEAD is detached.
+- Initialize submodules from the main checkout's existing local gitdirs, without network fetches.
+- Automatically commit verified changes locally on the task branch, so the result is reviewable.
+- Merge into the base branch in the main checkout when asked or before using changes outside the worktree; submissions, snapshots, deployment, and evaluation run from that base checkout.
+- Before merging, check main-checkout status; overlapping uncommitted files or conflicts require asking, without unrequested stashing, overwriting, or conflict resolution.
+- If unmerged, state the branch, commit, and worktree path and ask whether to merge.
+- After merge or explicit discard, remove the worktree and task branch and prune worktree references.
+- Push only when explicitly requested; PRs are user-managed.
 
-# Tests and docs
+# Change boundaries
 
 - Do not add or modify tests in the repository unless explicitly asked; verify with throwaway scripts outside the repo (session temp dir) and delete them afterwards, so no test file reaches the diff or a commit.
 - Do not edit docs (`docs/`, READMEs, `*.md` in the repo) unless explicitly asked; keep docs byte-identical to `master` (or the repo's default branch), and report any pre-existing doc difference against it rather than silently carrying it along.
-- Pass both rules verbatim into every `implementer` prompt, since subagents do not see this file's intent otherwise.
 
-# Subagents (`reader`, `thinker`, `implementer`)
+# Research records
 
-- Keep the main session on reasoning, user clarification (`ask_user_question`), reading local `MEMORY.md`, and orchestrating subagents, so exploration, CLI/SSH output, and edits stay out of the main context.
-- Use `reader` for local, remote (`ssh <host>`), and CLI provenance-backed evidence, `thinker` for independent second-opinion plans or trade-off analyses without edits, and `implementer` for settled file or target changes and command execution, matching delegation to the work.
-- Batch parallel tool calls and filter large outputs with `codemode` inside the executing agent instead of embedding large multi-step scripts into a single `bash` call, keeping tool invocations concise and inspectable.
-- A single `implementer` can edit within the task's scope; concurrent `implementer`s in the same directory need non-overlapping file assignments to avoid overwriting each other.
-- Make prompts self-contained with relevant memory facts, host paths, and provenance or verification requirements, leaving delegated searches and execution to their assigned agent.
-- Inspect actual diffs and verification output after an `implementer` finishes (directly on small targeted ranges or via `reader` for large/remote checks) before reporting completion.
+- Keep experiment context and results in Feishu, not AGENTS or local memory.
+- Read the category template; reuse the task-setting document across dates and queues, creating one only if none exists.
+- Put the latest dated experiment entries first, with Motivation, Recipe, Conclusion, and Training dynamics.
+- Patch only the target entry and verify the published content.
+- Algo: https://wvixbzgc0u7.feishu.cn/wiki/E7Dcw1RpDisdnikydR6ceD1mnKd
+- Data: https://wvixbzgc0u7.feishu.cn/wiki/Q6ZNwYs72iOQuJk5i9NcnuhdnDh
+- Eval: https://wvixbzgc0u7.feishu.cn/wiki/Jj6mw9qxNibi54kYanLcAPhAnTh
+- Infra: https://wvixbzgc0u7.feishu.cn/wiki/Tucxw8ApYiiTUskfSRZcRaATnDc

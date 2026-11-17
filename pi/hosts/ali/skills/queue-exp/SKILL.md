@@ -139,8 +139,10 @@ Resolve the long-lived task setting from the user's queue context/config, not
 from one method, variant, or run/job ID. Use the existing `lark-doc` and
 `lark-wiki` skills with `--as bot` for all document/wiki reads and writes.
 Keep bot identity on permission failures; never fall back to user identity.
-Read the relevant category's online template with the exact title
-`实验记录模版`, using the category links in global AGENTS.
+Read the record rules, writing style, and category index in
+`playground/users/xuyucheng/WORKLOG.md` in the active StepTron checkout.
+Then read the relevant category's online template with the exact title
+`实验记录模版`.
 Search candidate setting documents across the appropriate existing sections
 and inspect their contents before creating anything; prefer the existing
 setting document and create one only when none exists. Reuse it across dates

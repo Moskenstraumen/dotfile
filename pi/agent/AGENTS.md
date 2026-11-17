@@ -1,3 +1,9 @@
+# Hosts and routing
+
+- `mac` (`/Users/moskenstraumen/Documents/Work/step`): full network reachability; local configuration and cross-host file synchronization.
+- `ali` (`/mnt/cpfs/xuyucheng-fileset`): training and data.
+- `stepmind` (`/data/projects`): deployment and evaluation.
+
 # Working style
 
 - Respond in the user's language; default to Chinese.
@@ -37,11 +43,4 @@
 
 # Research records
 
-- Keep experiment context and results in Feishu, not AGENTS or local memory; read and write experiment documents consistently with `--as bot`, without falling back to user identity on permission failures.
-- Read the category template; reuse the task setting document across dates and queues, creating one only if none exists.
-- Put the latest dated experiment entries first, with Motivation, Recipe, Conclusion, and Training dynamics.
-- Patch only the target entry and verify the published content.
-- Algo: https://wvixbzgc0u7.feishu.cn/wiki/E7Dcw1RpDisdnikydR6ceD1mnKd
-- Data: https://wvixbzgc0u7.feishu.cn/wiki/Q6ZNwYs72iOQuJk5i9NcnuhdnDh
-- Eval: https://wvixbzgc0u7.feishu.cn/wiki/Jj6mw9qxNibi54kYanLcAPhAnTh
-- Infra: https://wvixbzgc0u7.feishu.cn/wiki/Tucxw8ApYiiTUskfSRZcRaATnDc
+- Read record rules and the category index in `playground/users/xuyucheng/WORKLOG.md` in the active StepTron checkout.

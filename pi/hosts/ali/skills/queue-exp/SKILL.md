@@ -137,8 +137,10 @@ The watcher hands off from `QUEUE_EXP_WORKSPACE` (workspace root by default):
 
 Resolve the long-lived task setting from the user's queue context/config, not
 from one method, variant, or run/job ID. Use the existing `lark-doc` and
-`lark-wiki` skills directly. Read the relevant category's online
-`*Task setting 实验记录模板`, using the category links in global AGENTS.
+`lark-wiki` skills with `--as bot` for all document/wiki reads and writes.
+Keep bot identity on permission failures; never fall back to user identity.
+Read the relevant category's online template with the exact title
+`实验记录模版`, using the category links in global AGENTS.
 Search candidate setting documents across the appropriate existing sections
 and inspect their contents before creating anything; prefer the existing
 setting document and create one only when none exists. Reuse it across dates
@@ -169,12 +171,12 @@ python3 report_figures.py <out-dir> <run>=<tb-dir>... --algo <algo>
 python3 queue_exp.py hf-cell <job-id>
 ```
 
-Publish with `lark-doc`/`lark-wiki`, patching only the target entry and any
-directly affected summary, never replacing the whole document. Fetch the
-published content and verify the entry's identifiers, results, figures, and
-chosen document URL before claiming success. On failed or unresolved
-publication, leave the digest absent and report the failure or decision
-needed through the handoff/owner channel.
+Publish with `lark-doc`/`lark-wiki` using `--as bot`, patching only the target
+entry and any directly affected summary, never replacing the whole document.
+Fetch the published content with `--as bot` and verify the entry's identifiers,
+results, figures, and chosen document URL before claiming success. On failed or
+unresolved publication, leave the digest absent and report the failure or
+decision needed through the handoff/owner channel.
 
 Only after verified publication, the existing report cache may record the
 chosen URL and the absolute local Markdown path for the published entry:

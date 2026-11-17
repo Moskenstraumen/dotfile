@@ -37,8 +37,8 @@
 
 # Research records
 
-- Keep experiment context and results in Feishu, not AGENTS or local memory.
-- Read the category template; reuse the task-setting document across dates and queues, creating one only if none exists.
+- Keep experiment context and results in Feishu, not AGENTS or local memory; read and write experiment documents consistently with `--as bot`, without falling back to user identity on permission failures.
+- Read the category template; reuse the task setting document across dates and queues, creating one only if none exists.
 - Put the latest dated experiment entries first, with Motivation, Recipe, Conclusion, and Training dynamics.
 - Patch only the target entry and verify the published content.
 - Algo: https://wvixbzgc0u7.feishu.cn/wiki/E7Dcw1RpDisdnikydR6ceD1mnKd

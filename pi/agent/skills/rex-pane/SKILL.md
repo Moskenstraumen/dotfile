@@ -49,6 +49,6 @@ EOF
 ## Delegation rules
 
 - Give a self-contained prompt with exact paths, scope (read-only inspection vs authorized code changes in an `agent/<name>` worktree), and verification commands.
-- When delegating code edits, include both `Change boundaries` rules from `AGENTS.md` verbatim.
+- When delegating code edits, include all `Change boundaries` rules from `AGENTS.md` verbatim.
 - Concurrent panes in the same repository must have non-overlapping file assignments.
 - If a pane returns `state=blocked`, report the prompt message and `window_id` to the user rather than retrying blindly.

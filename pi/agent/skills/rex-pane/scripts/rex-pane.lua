@@ -11,6 +11,7 @@ local host = args.host or "mac"
 local cwd = assert(args.cwd, "cwd is required")
 local prompt = assert(args.prompt, "prompt is required")
 local pi_session_id = assert(args.pi_session_id, "pi_session_id is required")
+local session_file = args.session_file or ""
 local label = args.label or ("pi:" .. pi_session_id:sub(1, 8))
 local extractor = assert(args.extractor, "extractor path is required")
 local baseline_lines = tonumber(args.baseline_lines) or 0
@@ -23,11 +24,16 @@ local cmd = {
   'export PI_PROGRAM_STATUS=1 REX_PANE_CHILD=1; cd -- "$1" && shift && exec pi "$@"',
   "rex-pane",
   cwd,
-  "--session-id",
-  pi_session_id,
-  "--name",
-  label,
 }
+if session_file ~= "" then
+  table.insert(cmd, "--session")
+  table.insert(cmd, session_file)
+else
+  table.insert(cmd, "--session-id")
+  table.insert(cmd, pi_session_id)
+end
+table.insert(cmd, "--name")
+table.insert(cmd, label)
 if args.model and args.model ~= "" then
   table.insert(cmd, "--model")
   table.insert(cmd, args.model)
@@ -70,7 +76,7 @@ local function capture_screen()
 end
 
 local function inspect_session()
-  local r, exec_err = rex.exec({
+  local argv = {
     "python3",
     extractor,
     "--extract-session",
@@ -80,7 +86,12 @@ local function inspect_session()
     pi_session_id,
     "--baseline-lines",
     tostring(baseline_lines),
-  }, { timeout = 25 })
+  }
+  if session_file ~= "" then
+    table.insert(argv, "--baseline-file")
+    table.insert(argv, session_file)
+  end
+  local r, exec_err = rex.exec(argv, { timeout = 25 })
   if not r or not r.ok or r.stdout == "" then
     return nil, (exec_err or (r and r.stderr) or "session extract failed")
   end
@@ -117,6 +128,22 @@ end
 local started = os.time()
 local last_checked_lines = baseline_lines
 
+local function find_root_record(ps)
+  local records = ps and ps.records
+  if type(records) ~= "table" then
+    return nil
+  end
+  if type(records[""]) == "table" then
+    return records[""]
+  end
+  for _, rec in ipairs(records) do
+    if type(rec) == "table" and (rec.id == nil or rec.id == "") then
+      return rec
+    end
+  end
+  return nil
+end
+
 local function handle_root_record(rec)
   if not rec or not rec.state then
     return nil
@@ -145,11 +172,9 @@ local function handle_root_record(rec)
         usage = info.usage,
       })
     end
-    if info and info.total_lines then
-      last_checked_lines = info.total_lines
-    elseif ext_err then
-      -- Give filesystem flush a brief moment once before treating as missing.
-      rex.sleep(0.4)
+    if (ext_err or (info and not info.settled and #(info.active_bg or {}) == 0)) then
+      -- Give filesystem flush a brief moment once before returning to the wait loop.
+      rex.sleep(0.35)
       info = inspect_session()
       if info and info.settled then
         return finish(true, "done", {
@@ -158,6 +183,9 @@ local function handle_root_record(rec)
           usage = info.usage,
         })
       end
+    end
+    if info and info.total_lines then
+      last_checked_lines = info.total_lines
     end
   end
   return nil
@@ -187,7 +215,7 @@ while true do
     -- Poll current program_status and child process health in case a fast turn
     -- settled before rex.wait subscribed or the shell/pi exited early.
     local ps = rex.block.call("com.superlogical.terminal", "program_status", { block_id = bid })
-    local root_rec = ps and ps.records and ps.records[""]
+    local root_rec = find_root_record(ps)
     if root_rec then
       local res = handle_root_record(root_rec)
       if res then

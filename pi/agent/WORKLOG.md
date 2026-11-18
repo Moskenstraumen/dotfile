@@ -24,6 +24,7 @@
 
 - [飞书目录](https://wvixbzgc0u7.feishu.cn/wiki/Tucxw8ApYiiTUskfSRZcRaATnDc)
 - [实验记录模版](https://wvixbzgc0u7.feishu.cn/wiki/KKPgwZthuiPmDJkQjiEconW3n4f)
+- [阿里云训练 -> Stepmind部署SOP](https://wvixbzgc0u7.feishu.cn/wiki/LWaLwIryXiLEDsknG3ncA6rcnib)
 
 ## 记录规则
 

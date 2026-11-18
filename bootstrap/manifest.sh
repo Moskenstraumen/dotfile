@@ -43,6 +43,10 @@ MANIFEST_PI=(
 	"pi/agent/extensions/list-models.ts|$HOME/.pi/agent/extensions/list-models.ts"
 	"pi/agent/extensions/session-cleanup.ts|$HOME/.pi/agent/extensions/session-cleanup.ts"
 	"pi/agent/skills/rex/SKILL.md|$HOME/.pi/agent/skills/rex/SKILL.md"
+)
+
+# Orchestrator-only skills linked on the macOS entry point, never on remote workers.
+MANIFEST_PI_LOCAL=(
 	"pi/agent/skills/rex-pane/SKILL.md|$HOME/.pi/agent/skills/rex-pane/SKILL.md"
 	"pi/agent/skills/rex-pane/scripts/rex-pane|$HOME/.pi/agent/skills/rex-pane/scripts/rex-pane"
 	"pi/agent/skills/rex-pane/scripts/rex-pane.lua|$HOME/.pi/agent/skills/rex-pane/scripts/rex-pane.lua"

@@ -24,7 +24,7 @@ Apply the clarity principles of ASD-STE100 while following natural, modern Chine
 
 # Delegation
 
-- Handle lightweight `mac` tasks directly in the main session; delegate remote work (`ali`, `stepmind`) or context-heavy tasks by opening a Rex pane via `~/.pi/agent/skills/rex-pane/SKILL.md`.
+- From the `mac` main session only, handle lightweight local tasks directly and delegate remote work (`ali`, `stepmind`) or context-heavy local work by opening a Rex pane via `~/.pi/agent/skills/rex-pane/SKILL.md`; never nest `rex-pane` from a remote host or inside an already-delegated pane (`REX_PANE_CHILD=1`).
 - Run cross-host work natively inside a remote Rex pane on the target host instead of chaining `ssh <host>` commands from `mac`; launch `rex-pane` asynchronously in the background so independent panes run in parallel.
 - Give each delegated pane a self-contained prompt stating its exact scope (read-only inspection vs authorized edits), required context, and verification commands; pass `--session-id` only to continue related context.
 - Concurrent panes editing in one directory must have non-overlapping file assignments; pass both Change boundaries rules below verbatim whenever delegating code changes.

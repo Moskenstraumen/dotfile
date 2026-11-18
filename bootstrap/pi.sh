@@ -42,6 +42,9 @@ preflight_manifest() {
 }
 
 preflight_manifest ${MANIFEST_PI[@]+"${MANIFEST_PI[@]}"}
+if [ "$(uname -s)" = Darwin ]; then
+	preflight_manifest ${MANIFEST_PI_LOCAL[@]+"${MANIFEST_PI_LOCAL[@]}"}
+fi
 
 ensure_real_directory() {
 	local dir="$1" backup
@@ -56,10 +59,15 @@ ensure_real_directory() {
 ensure_real_directory "$PI_ROOT"
 chmod 700 "$PI_ROOT"
 ensure_real_directory "$PI_ROOT/skills/rex"
-ensure_real_directory "$PI_ROOT/skills/rex-pane/scripts"
 
 log "linking Pi config into $PI_ROOT"
 apply_manifest ${MANIFEST_PI[@]+"${MANIFEST_PI[@]}"}
+if [ "$(uname -s)" = Darwin ]; then
+	ensure_real_directory "$PI_ROOT/skills/rex-pane/scripts"
+	apply_manifest ${MANIFEST_PI_LOCAL[@]+"${MANIFEST_PI_LOCAL[@]}"}
+else
+	rm -rf "$PI_ROOT/skills/rex-pane"
+fi
 
 if have pi && [ ! -d "$PI_ROOT/npm/node_modules" ]; then
 	log "installing declared Pi packages in $PI_ROOT"

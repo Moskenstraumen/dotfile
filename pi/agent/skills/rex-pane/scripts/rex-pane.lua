@@ -2,6 +2,10 @@
 -- (plus process-exit fallback), verify session JSONL settlement, and optionally
 -- close the finished tab.
 
+if os.getenv("REX_PANE_CHILD") == "1" then
+  error("nested rex-pane execution is forbidden inside a delegated pane", 0)
+end
+
 local args = rex.args or {}
 local host = args.host or "mac"
 local cwd = assert(args.cwd, "cwd is required")
@@ -16,7 +20,7 @@ local timeout_sec = tonumber(args.timeout_sec) or 3600
 local cmd = {
   "zsh",
   "-lc",
-  'export PI_PROGRAM_STATUS=1; cd -- "$1" && shift && exec pi "$@"',
+  'export PI_PROGRAM_STATUS=1 REX_PANE_CHILD=1; cd -- "$1" && shift && exec pi "$@"',
   "rex-pane",
   cwd,
   "--session-id",

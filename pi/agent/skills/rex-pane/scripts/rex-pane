@@ -203,6 +203,10 @@ def main() -> int:
         print(json.dumps(run_extract(args.host, args.session_id, args.baseline_lines), ensure_ascii=False))
         return 0
 
+    if os.environ.get("REX_PANE_CHILD") == "1":
+        sys.stderr.write("error: nested rex-pane execution is forbidden inside a delegated pane\n")
+        return 2
+
     rex_session = resolve_rex_session(args.host, args.rex_session)
 
     if args.close_window:

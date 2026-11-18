@@ -140,7 +140,7 @@ from one method, variant, or run/job ID. Use the existing `lark-doc` and
 `lark-wiki` skills with `--as bot` for all document/wiki reads and writes.
 Keep bot identity on permission failures; never fall back to user identity.
 Read the record rules, writing style, and category index in
-`playground/users/xuyucheng/WORKLOG.md` in the active StepTron checkout.
+`~/.pi/agent/WORKLOG.md`.
 Then read the relevant category's online template with the exact title
 `实验记录模版`.
 Search candidate setting documents across the appropriate existing sections
@@ -173,18 +173,20 @@ python3 report_figures.py <out-dir> <run>=<tb-dir>... --algo <algo>
 python3 queue_exp.py hf-cell <job-id>
 ```
 
-Publish with `lark-doc`/`lark-wiki` using `--as bot`, patching only the target
-entry and any directly affected summary, never replacing the whole document.
+Publish directly to Feishu with `lark-doc`/`lark-wiki` using `--as bot`,
+patching only the target entry and any directly affected summary, never
+replacing the whole document and never saving an experiment report or draft
+Markdown file to host disk (remove any transient `/tmp` API payload immediately).
 Fetch the published content with `--as bot` and verify the entry's identifiers,
 results, figures, and chosen document URL before claiming success. On failed or
 unresolved publication, leave the digest absent and report the failure or
 decision needed through the handoff/owner channel.
 
 Only after verified publication, the existing report cache may record the
-chosen URL and the absolute local Markdown path for the published entry:
+chosen URL:
 
 ```bash
-python3 queue_state.py report --doc <url> --md <absolute-md-path>
+python3 queue_state.py report --doc <url>
 ```
 
 This cache is not a cross-queue registry. After verified publication, write

@@ -43,6 +43,7 @@ MANIFEST_PI_INTERACTIVE=(
 	"pi/agent/extensions/list-models.ts|$HOME/.pi/agent/extensions/list-models.ts"
 	"pi/agent/extensions/session-cleanup.ts|$HOME/.pi/agent/extensions/session-cleanup.ts"
 	"pi/agent/AGENTS.md|$HOME/.pi/agent/AGENTS.md"
+	"pi/agent/WORKLOG.md|$HOME/.pi/agent/WORKLOG.md"
 	"pi/agent/settings.json|$HOME/.pi/agent/settings.json"
 	"pi/agent/web-search.json|$HOME/.pi/agent/web-search.json"
 	"pi/agent/agents/reader.md|$HOME/.pi/agent/agents/reader.md"

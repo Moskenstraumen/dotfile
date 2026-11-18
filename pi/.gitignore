@@ -3,6 +3,7 @@
 !.gitignore
 !/agent/
 !/agent/AGENTS.md
+!/agent/WORKLOG.md
 !/agent/models.json
 !/agent/settings.json
 !/agent/starline.json

@@ -1,7 +1,7 @@
 {
-  "defaultProvider": "modelproxy",
-  "defaultModel": "gpt-6.1-sol-coding",
-  "defaultThinkingLevel": "medium",
+  "defaultProvider": "stepcode",
+  "defaultModel": "stepcode-gpt-6.1-sol-eastus2",
+  "defaultThinkingLevel": "high",
   "doubleEscapeAction": "tree",
   "treeFilterMode": "user-only",
   "branchSummary": {

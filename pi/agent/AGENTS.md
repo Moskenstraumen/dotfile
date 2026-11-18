@@ -32,7 +32,7 @@ Apply the clarity principles of ASD-STE100 while following natural, modern Chine
 
 # Git workflow
 
-- Isolate each task/session in one worktree on `agent/<name>`, based on the main checkout's current symbolic branch; ask if HEAD is detached.
+- Isolate each task/session in one worktree at `~/.local/state/worktrees/<name>` on branch `agent/<name>`, based on the main checkout's current symbolic branch; ask if HEAD is detached.
 - Initialize submodules from the main checkout's existing local gitdirs, without network fetches.
 - Automatically commit verified changes locally on `agent/<name>` using single-line Conventional Commit messages, so the result is reviewable.
 - Merge into the base branch in the main checkout when asked or before using changes outside the worktree; submissions, snapshots, deployment, and evaluation run from that base checkout.

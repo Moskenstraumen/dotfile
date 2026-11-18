@@ -82,7 +82,7 @@ if ! have pi && have npm; then
 	log "installing Pi"
 	npm install -g @earendil-works/pi-coding-agent || warn "could not install pi"
 fi
-bash "$DOTFILES_ROOT/bootstrap/pi.sh" auto || warn "could not finish Pi configuration"
+bash "$DOTFILES_ROOT/bootstrap/pi.sh" || warn "could not finish Pi configuration"
 
 # yabai and skhd manage their own launchd services and the taps shipping them
 # provide no brew service file, so `brew services restart` fails on both with

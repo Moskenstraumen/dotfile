@@ -22,15 +22,12 @@ usage() {
 		'Links Pi configuration into ~/.pi/agent and installs declared packages if absent.'
 }
 
-if [ "$#" -gt 1 ]; then
-	usage >&2
-	exit 1
+if [ "$#" -gt 0 ]; then
+	case "$1" in
+		-h|--help|help) usage; exit 0 ;;
+		*) usage >&2; die "unexpected argument: $1" ;;
+	esac
 fi
-case "${1:-auto}" in
-	auto|interactive|mac|ali|stepmind) ;;
-	-h|--help|help) usage; exit 0 ;;
-	*) usage >&2; die "unexpected argument: $1" ;;
-esac
 
 PI_ROOT="$HOME/.pi/agent"
 
@@ -46,20 +43,10 @@ preflight_manifest() {
 
 preflight_manifest ${MANIFEST_PI[@]+"${MANIFEST_PI[@]}"}
 
-backup_path() {
-	local base="$1.backup.$(date +%Y%m%d%H%M%S)" candidate suffix=0
-	candidate="$base"
-	while [ -e "$candidate" ] || [ -L "$candidate" ]; do
-		suffix=$((suffix + 1))
-		candidate="$base.$suffix"
-	done
-	printf '%s\n' "$candidate"
-}
-
 ensure_real_directory() {
 	local dir="$1" backup
 	if [ -L "$dir" ] || { [ -e "$dir" ] && [ ! -d "$dir" ]; }; then
-		backup="$(backup_path "$dir")"
+		backup="${dir}.backup.$(date +%Y%m%d%H%M%S)"
 		mv "$dir" "$backup"
 		log "backed up $dir -> $backup"
 	fi
@@ -85,32 +72,3 @@ fi
 if [ ! -f "$PI_ROOT/auth.json" ]; then
 	log "no Pi credentials yet; open pi and use /login, or add gateway keys to $PI_ROOT/auth.json"
 fi
-
-for retired in \
-	session-namer.json \
-	mcp.json \
-	mcp-auth.json \
-	cliproxyapi.json \
-	cliproxyapi-models.json \
-	subagents.json \
-	agents/reader.md \
-	agents/thinker.md \
-	agents/implementer.md \
-	extensions/sanitize-antigravity-prompt.ts
-do
-	if [ -e "$PI_ROOT/$retired" ] || [ -L "$PI_ROOT/$retired" ]; then
-		rm -f "$PI_ROOT/$retired"
-	fi
-done
-rmdir "$PI_ROOT/agents" 2>/dev/null || true
-
-for retired_dir in \
-	"$HOME/.config/rex-superagent" \
-	"$HOME/.local/share/rex-superagent" \
-	"$HOME/.agents/skills/rex"
-do
-	if [ -e "$retired_dir" ] || [ -L "$retired_dir" ]; then
-		rm -rf "$retired_dir"
-	fi
-done
-rmdir "$HOME/.agents/skills" "$HOME/.agents" 2>/dev/null || true

@@ -177,7 +177,7 @@ if ! have pi; then
 		failed+=(pi)
 	fi
 fi
-bash "$DOTFILES_ROOT/bootstrap/pi.sh" auto || failed+=(pi-config)
+bash "$DOTFILES_ROOT/bootstrap/pi.sh" || failed+=(pi-config)
 
 # Pull plugins at the versions pinned in nvim/lazy-lock.json, so every box
 # runs exactly what the workstation does. Mason tools are left to :Mason.

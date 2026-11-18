@@ -8,10 +8,6 @@
 # There is deliberately no shared list: every environment enumerates its own
 # files in full, so you can read either array and know exactly what that
 # machine gets without cross-referencing the other.
-#
-# The MANIFEST_PI_* arrays are separate on purpose: both setup profiles call
-# bootstrap/pi.sh, which preflights and links these agent directories separately
-# from the generic MANIFEST_LOCAL and MANIFEST_REMOTE config.
 
 MANIFEST_LOCAL=(
 	"starship.toml|$HOME/.config/starship.toml"
@@ -24,6 +20,7 @@ MANIFEST_LOCAL=(
 	"sketchybar|$HOME/.config/sketchybar"
 	"nvim|$HOME/.config/nvim"
 	"karabiner/karabiner.json|$HOME/.config/karabiner/karabiner.json"
+	"pi/agent/AGENTS.md|$HOME/.gemini/config/AGENTS.md"
 )
 
 MANIFEST_REMOTE=(
@@ -36,32 +33,17 @@ MANIFEST_REMOTE=(
 )
 
 # Declarative leaves only; credentials, installed packages and runtime state stay local.
-MANIFEST_PI_INTERACTIVE=(
-	"pi/agent/models.json|$HOME/.pi/agent/models.json"
-	"pi/agent/starline.json|$HOME/.pi/agent/starline.json"
-	"pi/agent/subagents.json|$HOME/.pi/agent/subagents.json"
-	"pi/agent/extensions/list-models.ts|$HOME/.pi/agent/extensions/list-models.ts"
-	"pi/agent/extensions/session-cleanup.ts|$HOME/.pi/agent/extensions/session-cleanup.ts"
+MANIFEST_PI=(
 	"pi/agent/AGENTS.md|$HOME/.pi/agent/AGENTS.md"
 	"pi/agent/WORKLOG.md|$HOME/.pi/agent/WORKLOG.md"
+	"pi/agent/models.json|$HOME/.pi/agent/models.json"
 	"pi/agent/settings.json|$HOME/.pi/agent/settings.json"
+	"pi/agent/starline.json|$HOME/.pi/agent/starline.json"
 	"pi/agent/web-search.json|$HOME/.pi/agent/web-search.json"
-	"pi/agent/agents/reader.md|$HOME/.pi/agent/agents/reader.md"
-	"pi/agent/agents/thinker.md|$HOME/.pi/agent/agents/thinker.md"
-	"pi/agent/agents/implementer.md|$HOME/.pi/agent/agents/implementer.md"
+	"pi/agent/extensions/list-models.ts|$HOME/.pi/agent/extensions/list-models.ts"
+	"pi/agent/extensions/session-cleanup.ts|$HOME/.pi/agent/extensions/session-cleanup.ts"
 	"pi/agent/skills/rex/SKILL.md|$HOME/.pi/agent/skills/rex/SKILL.md"
-)
-
-MANIFEST_PI_REX_SUPERAGENT=(
-	"pi/agent/models.json|$HOME/.local/share/rex-superagent/pi/agent/models.json"
-	"pi/agent/starline.json|$HOME/.local/share/rex-superagent/pi/agent/starline.json"
-	"pi/agent/subagents.json|$HOME/.local/share/rex-superagent/pi/agent/subagents.json"
-	"pi/agent/extensions/list-models.ts|$HOME/.local/share/rex-superagent/pi/agent/extensions/list-models.ts"
-	"pi/agent/extensions/session-cleanup.ts|$HOME/.local/share/rex-superagent/pi/agent/extensions/session-cleanup.ts"
-	"rex-superagent/pi/agent/settings.json|$HOME/.local/share/rex-superagent/pi/agent/settings.json"
-	"rex-superagent/pi/agent/web-search.json|$HOME/.local/share/rex-superagent/pi/agent/web-search.json"
-	"rex-superagent/pi/agent/agents/reader.md|$HOME/.local/share/rex-superagent/pi/agent/agents/reader.md"
-	"rex-superagent/pi/agent/agents/thinker.md|$HOME/.local/share/rex-superagent/pi/agent/agents/thinker.md"
-	"rex-superagent/pi/agent/agents/implementer.md|$HOME/.local/share/rex-superagent/pi/agent/agents/implementer.md"
-	"pi/agent/skills/rex/SKILL.md|$HOME/.local/share/rex-superagent/pi/agent/skills/rex/SKILL.md"
+	"pi/agent/skills/rex-pane/SKILL.md|$HOME/.pi/agent/skills/rex-pane/SKILL.md"
+	"pi/agent/skills/rex-pane/scripts/rex-pane|$HOME/.pi/agent/skills/rex-pane/scripts/rex-pane"
+	"pi/agent/skills/rex-pane/scripts/rex-pane.lua|$HOME/.pi/agent/skills/rex-pane/scripts/rex-pane.lua"
 )

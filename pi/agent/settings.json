@@ -1,6 +1,6 @@
 {
-  "defaultProvider": "cliproxyapi",
-  "defaultModel": "gemini-4-carbon-high",
+  "defaultProvider": "modelproxy",
+  "defaultModel": "gpt-6.1-sol-coding",
   "defaultThinkingLevel": "medium",
   "doubleEscapeAction": "tree",
   "treeFilterMode": "user-only",
@@ -9,13 +9,11 @@
   },
   "theme": "system",
   "defaultTools": [
-    "+ls"
+    "+ls",
+    "+codemode"
   ],
   "compaction": {
     "modelOverrides": {
-      "cliproxyapi/gemini-4-carbon-high": {
-        "reserveTokens": 629146
-      },
       "modelproxy/claude-opus-5.5": {
         "reserveTokens": 600000
       },
@@ -30,9 +28,7 @@
     "npm:@gotgenes/pi-permission-system",
     "npm:pi-tidy",
     "npm:pi-starline",
-    "npm:pi-background",
-    "npm:@tintinweb/pi-subagents",
-    "npm:@router-for-me/pi-cliproxyapi-provider"
+    "npm:pi-background"
   ],
   "lastChangelogVersion": "1.4.0",
   "showCacheMissNotices": false,
@@ -43,5 +39,21 @@
   },
   "hideThinkingBlock": false,
   "showHardwareCursor": true,
-  "transport": "auto"
+  "transport": "auto",
+  "tidy": {
+    "alwaysShowTools": [
+      "edit",
+      "write"
+    ],
+    "toolColors": {
+      "bash": "bashMode",
+      "read": "toolTitle",
+      "edit": "syntaxVariable",
+      "write": "syntaxVariable",
+      "grep": "syntaxOperator",
+      "find": "syntaxOperator",
+      "ls": "syntaxOperator",
+      "mcp": "customMessageLabel"
+    }
+  }
 }

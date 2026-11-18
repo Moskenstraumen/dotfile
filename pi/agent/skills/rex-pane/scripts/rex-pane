@@ -1,0 +1,277 @@
+#!/usr/bin/env python3
+"""Run or resume an interactive Pi task inside a local or remote Rex pane."""
+
+import argparse
+import glob
+import json
+import os
+import re
+import subprocess
+import sys
+import tempfile
+import uuid
+from pathlib import Path
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+LUA_SCRIPT = SCRIPT_DIR / "rex-pane.lua"
+
+SSH_BASE = {
+    "stepmind": ["ssh", "-o", "StrictHostKeyChecking=yes", "-o", "UpdateHostKeys=no", "stepmind"],
+}
+
+EXTRACT_SNIPPET = r"""
+import glob, json, os, re, sys
+
+sid = sys.argv[1]
+baseline = int(sys.argv[2])
+root = os.path.expanduser("~/.pi/agent/sessions")
+matches = sorted(glob.glob(os.path.join(root, "*", f"*_{sid}.jsonl")), key=os.path.getmtime, reverse=True)
+if not matches:
+    matches = sorted(glob.glob(os.path.join(root, "*", f"{sid}.jsonl")), key=os.path.getmtime, reverse=True)
+if not matches:
+    print(json.dumps({"found": False, "settled": False, "total_lines": 0}))
+    sys.exit(0)
+
+path = matches[0]
+with open(path, "r", encoding="utf-8", errors="replace") as f:
+    raw_lines = [ln for ln in f.read().splitlines() if ln.strip()]
+
+total = len(raw_lines)
+if total <= baseline:
+    print(json.dumps({"found": True, "session_file": path, "settled": False, "total_lines": total}))
+    sys.exit(0)
+
+new_entries = []
+for ln in raw_lines[baseline:]:
+    try:
+        new_entries.append(json.loads(ln))
+    except Exception:
+        pass
+
+last_user_idx = -1
+for i, obj in enumerate(new_entries):
+    if obj.get("type") == "message" and isinstance(obj.get("message"), dict) and obj["message"].get("role") == "user":
+        last_user_idx = i
+
+if last_user_idx < 0:
+    print(json.dumps({"found": True, "session_file": path, "settled": False, "total_lines": total}))
+    sys.exit(0)
+
+tail = new_entries[last_user_idx + 1:]
+active_bg = set()
+last_wake_or_tool_idx = -1
+last_assistant = None
+last_assistant_idx = -1
+usage_totals = {"input": 0, "output": 0, "totalTokens": 0}
+
+bg_start_re = re.compile(r"(?:Started (bg\d+);|moved to the background as (bg\d+)\.)")
+bg_done_re = re.compile(r"^(bg\d+)\s+(?:exited|killed|failed)\b")
+
+for i, obj in enumerate(tail):
+    t = obj.get("type")
+    if t == "message":
+        msg = obj.get("message") or {}
+        role = msg.get("role")
+        if role == "assistant":
+            last_assistant = msg
+            last_assistant_idx = i
+            u = msg.get("usage") or {}
+            for k in ("input", "output", "totalTokens"):
+                if isinstance(u.get(k), (int, float)):
+                    usage_totals[k] += int(u[k])
+        elif role == "toolResult":
+            last_wake_or_tool_idx = i
+            details = msg.get("details") or {}
+            if isinstance(details, dict) and isinstance(details.get("id"), str) and details["id"].startswith("bg"):
+                active_bg.add(details["id"])
+            for item in (msg.get("content") or []):
+                if isinstance(item, dict) and item.get("type") == "text":
+                    for m in bg_start_re.finditer(item.get("text", "")):
+                        active_bg.add(m.group(1) or m.group(2))
+    elif t == "custom_message" and obj.get("customType") == "background-job":
+        last_wake_or_tool_idx = i
+        details = obj.get("details") or {}
+        headline = details.get("headline", "") if isinstance(details, dict) else ""
+        m = bg_done_re.match(headline)
+        if m:
+            active_bg.discard(m.group(1))
+
+has_tool_call = False
+reply_parts = []
+if last_assistant:
+    if last_assistant.get("stopReason") == "toolUse":
+        has_tool_call = True
+    for item in (last_assistant.get("content") or []):
+        if not isinstance(item, dict):
+            continue
+        if item.get("type") == "toolCall":
+            has_tool_call = True
+        elif item.get("type") == "text" and item.get("text"):
+            reply_parts.append(item["text"])
+
+settled = (
+    last_assistant is not None
+    and last_assistant_idx > last_wake_or_tool_idx
+    and not has_tool_call
+    and len(active_bg) == 0
+)
+
+print(json.dumps({
+    "found": True,
+    "session_file": path,
+    "total_lines": total,
+    "settled": settled,
+    "active_bg": sorted(active_bg),
+    "reply": "\n\n".join(reply_parts).strip(),
+    "usage": usage_totals,
+}, ensure_ascii=False))
+"""
+
+
+def ssh_cmd(host: str) -> list[str]:
+    return list(SSH_BASE.get(host, ["ssh", host]))
+
+
+def run_extract(host: str, session_id: str, baseline_lines: int) -> dict:
+    if host in ("mac", "local", ""):
+        proc = subprocess.run(
+            [sys.executable, "-c", EXTRACT_SNIPPET, session_id, str(baseline_lines)],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    else:
+        proc = subprocess.run(
+            [*ssh_cmd(host), "python3", "-", session_id, str(baseline_lines)],
+            input=EXTRACT_SNIPPET,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    return json.loads(proc.stdout)
+
+
+def rex_prefix(host: str) -> list[str]:
+    return ["rex"] if host in ("mac", "local", "") else ["rex", "-S", host]
+
+
+def resolve_rex_session(host: str, explicit: str | None) -> str:
+    if explicit:
+        return explicit
+    prefix = rex_prefix(host)
+    proc = subprocess.run([*prefix, "ls", "--json"], capture_output=True, text=True, check=True)
+    sessions = (json.loads(proc.stdout) or {}).get("sessions") or []
+    if sessions:
+        return sessions[0]["session_id"]
+    created = subprocess.run(
+        [*prefix, "new", "work", "--json"], capture_output=True, text=True, check=True
+    )
+    return json.loads(created.stdout)["session_id"]
+
+
+def default_cwd(host: str) -> str:
+    if host == "ali":
+        return "/mnt/cpfs/xuyucheng-fileset"
+    if host == "stepmind":
+        return "/data/projects"
+    return os.getcwd()
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--host", default="ali", help="Target host label: ali, stepmind, or mac")
+    ap.add_argument("--cwd", help="Working directory on the target host")
+    ap.add_argument("--name", help="Tab label in Rex")
+    ap.add_argument("--prompt", help="Task prompt (if omitted, read from stdin)")
+    ap.add_argument("--session-id", help="Pi session ID (omit to create new; pass to resume)")
+    ap.add_argument("--rex-session", help="Specific Rex session ID or label on target host")
+    ap.add_argument("--model", default="", help="Optional Pi model override (e.g. modelproxy/gpt-6-astra)")
+    ap.add_argument("--thinking", default="", help="Optional thinking level (low, medium, high, xhigh)")
+    ap.add_argument("--keep-open", action="store_true", help="Keep Rex tab open after completion")
+    ap.add_argument("--timeout", type=int, default=3600, help="Timeout in seconds (default: 3600)")
+    ap.add_argument("--json", action="store_true", help="Print raw JSON result")
+    ap.add_argument("--close-window", help="Close a kept-open Rex window ID on --host and exit")
+    ap.add_argument("--extract-session", action="store_true", help=argparse.SUPPRESS)
+    ap.add_argument("--baseline-lines", type=int, default=0, help=argparse.SUPPRESS)
+    args = ap.parse_args()
+
+    if args.extract_session:
+        if not args.session_id:
+            ap.error("--session-id required with --extract-session")
+        print(json.dumps(run_extract(args.host, args.session_id, args.baseline_lines), ensure_ascii=False))
+        return 0
+
+    rex_session = resolve_rex_session(args.host, args.rex_session)
+
+    if args.close_window:
+        subprocess.run(
+            [*rex_prefix(args.host), "window", "close", "-s", rex_session, args.close_window],
+            check=True,
+        )
+        return 0
+
+    prompt = args.prompt if args.prompt is not None else sys.stdin.read()
+    if not prompt or not prompt.strip():
+        ap.error("non-empty prompt required via stdin or --prompt")
+
+    pi_session_id = args.session_id or str(uuid.uuid4())
+    baseline_lines = 0
+    if args.session_id:
+        prior = run_extract(args.host, pi_session_id, 0)
+        baseline_lines = int(prior.get("total_lines") or 0)
+
+    label = args.name or f"pi:{pi_session_id[:8]}"
+    payload = {
+        "host": args.host,
+        "cwd": args.cwd or default_cwd(args.host),
+        "prompt": prompt,
+        "pi_session_id": pi_session_id,
+        "label": label,
+        "extractor": str(Path(__file__).resolve()),
+        "baseline_lines": baseline_lines,
+        "model": args.model,
+        "thinking": args.thinking,
+        "keep_open": args.keep_open,
+        "timeout_sec": args.timeout,
+    }
+
+    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as tf:
+        json.dump(payload, tf, ensure_ascii=False)
+        args_path = tf.name
+
+    try:
+        proc = subprocess.run(
+            [*rex_prefix(args.host), "do", "-s", rex_session, str(LUA_SCRIPT), "--args", f"@{args_path}"],
+            capture_output=True,
+            text=True,
+        )
+    finally:
+        Path(args_path).unlink(missing_ok=True)
+
+    if proc.returncode != 0:
+        sys.stderr.write(proc.stderr or proc.stdout or f"rex do exited with {proc.returncode}\n")
+        return proc.returncode or 1
+
+    result = json.loads(proc.stdout)
+    if args.json:
+        print(json.dumps(result, ensure_ascii=False, indent=2))
+    else:
+        header = [
+            f"[rex-pane] host={result.get('host')} state={result.get('state')} session_id={result.get('pi_session_id')}",
+        ]
+        if result.get("kept_open"):
+            header.append(f"window_id={result.get('window_id')} block_id={result.get('block_id')}")
+        if result.get("message"):
+            header.append(f"message={result.get('message')}")
+        print(" | ".join(header))
+        print("---")
+        if result.get("reply"):
+            print(result["reply"])
+        elif result.get("screen"):
+            print(result["screen"])
+
+    return 0 if result.get("ok") else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

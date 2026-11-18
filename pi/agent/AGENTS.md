@@ -22,16 +22,13 @@ Apply the clarity principles of ASD-STE100 while following natural, modern Chine
 
 - Name by purpose or responsibility, without arbitrary numbered labels or invented version suffixes; preserve actual external names and IDs.
 
-# Subagents
+# Delegation
 
-- Keep the main session on reasoning, user clarification, and orchestration; delegate exploration, CLI/SSH evidence, and execution.
-- Use `reader` for provenance-backed evidence, `thinker` for independent analysis without edits, and `implementer` for settled changes and execution.
-- Run cross-host work over `ssh <host>` inside subagents; use `bg_run` for commands or waits longer than about 30 seconds.
-- Give self-contained, scoped prompts with required context and verification; resume an agent only for related context and leave delegated work to it.
-- Parallelize independent work; concurrent implementers in one directory must have non-overlapping file assignments.
-- Batch independent tool calls and filter large outputs with `codemode` inside the executing agent.
-- Verify actual diffs and verification output after implementation, not just agent summaries.
-- Pass both Change boundaries rules below verbatim into every `implementer` prompt.
+- Handle lightweight `mac` tasks directly in the main session; delegate remote work (`ali`, `stepmind`) or context-heavy tasks by opening a Rex pane via `~/.pi/agent/skills/rex-pane/SKILL.md`.
+- Run cross-host work natively inside a remote Rex pane on the target host instead of chaining `ssh <host>` commands from `mac`; launch `rex-pane` asynchronously in the background so independent panes run in parallel.
+- Give each delegated pane a self-contained prompt stating its exact scope (read-only inspection vs authorized edits), required context, and verification commands; pass `--session-id` only to continue related context.
+- Concurrent panes editing in one directory must have non-overlapping file assignments; pass both Change boundaries rules below verbatim whenever delegating code changes.
+- Verify actual diffs and verification output before claiming completion, not just delegated summaries.
 
 # Git workflow
 

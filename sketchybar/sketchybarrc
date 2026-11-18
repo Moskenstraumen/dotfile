@@ -178,12 +178,13 @@ for ((i = 0; i < max_spaces; i++)); do
     click_script="yabai -m space --focus $sid"
 done
 
-sketchybar --add event yabai_space_changed
-sketchybar --add item yabai_updater left \
+sketchybar --add event yabai_space_changed \
+  --add event yabai_window_change \
+  --add item yabai_updater left \
   --set yabai_updater script="$PLUGIN_DIR/yabai_workspaces.sh" \
-  update_freq=3 \
+  updates=on \
   drawing=off \
-  --subscribe yabai_updater space_change yabai_space_changed
+  --subscribe yabai_updater space_change display_change yabai_space_changed yabai_window_change
 
 ################################
 #  LEFT: Apps & Controls       #

@@ -1,8 +1,13 @@
-info=$(yabai -m query --spaces --display)
-last=$(echo $info | jq '.[-1]."has-focus"')
+#!/usr/bin/env bash
 
-if [[ $last == "false" ]]; then
-    yabai -m space --focus next
-else
-    yabai -m space --focus $(echo $info | jq '.[0].index')
-fi
+target=$(yabai -m query --spaces --display | jq -r '
+  (map(.index)) as $ids |
+  (map(."has-focus") | index(true)) as $i |
+  if ($ids | length) > 0 and $i != null then
+    $ids[(($i + 1) % ($ids | length))]
+  else
+    empty
+  end
+')
+
+[ -n "$target" ] && yabai -m space --focus "$target"

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Run or resume an interactive Pi task inside a local or remote Rex pane."""
 
+from __future__ import annotations
+
 import argparse
 import glob
 import json

@@ -74,6 +74,7 @@ if last_user_idx < 0:
 
 tail = new_entries[last_user_idx + 1:]
 active_bg = set()
+open_ask_calls = {}
 last_wake_or_tool_idx = -1
 last_assistant = None
 last_assistant_idx = -1
@@ -94,8 +95,17 @@ for i, obj in enumerate(tail):
             for k in ("input", "output", "totalTokens"):
                 if isinstance(u.get(k), (int, float)):
                     usage_totals[k] += int(u[k])
+            for item in (msg.get("content") or []):
+                if (
+                    isinstance(item, dict)
+                    and item.get("type") == "toolCall"
+                    and item.get("name") == "ask_user_question"
+                    and isinstance(item.get("id"), str)
+                ):
+                    open_ask_calls[item["id"]] = (msg, item)
         elif role == "toolResult":
             last_wake_or_tool_idx = i
+            open_ask_calls.pop(msg.get("toolCallId"), None)
             details = msg.get("details") or {}
             if isinstance(details, dict) and isinstance(details.get("id"), str) and details["id"].startswith("bg"):
                 active_bg.add(details["id"])
@@ -111,6 +121,45 @@ for i, obj in enumerate(tail):
         if m:
             active_bg.discard(m.group(1))
 
+blocked = None
+if open_ask_calls:
+    ask_msg, ask_call = list(open_ask_calls.values())[-1]
+    ctx_parts = [
+        item["text"]
+        for item in (ask_msg.get("content") or [])
+        if isinstance(item, dict) and item.get("type") == "text" and item.get("text")
+    ]
+    raw_args = ask_call.get("arguments")
+    if isinstance(raw_args, str):
+        try:
+            raw_args = json.loads(raw_args)
+        except Exception:
+            raw_args = {}
+    questions = (raw_args or {}).get("questions") if isinstance(raw_args, dict) else None
+    questions = questions if isinstance(questions, list) else []
+    first_q = "waiting on ask_user_question"
+    q_blocks = []
+    for q in questions:
+        if not isinstance(q, dict):
+            continue
+        q_text = str(q.get("question") or "").strip()
+        if q_text and first_q == "waiting on ask_user_question":
+            first_q = q_text.splitlines()[0]
+        hdr = f"[{q.get('header')}] " if q.get("header") else ""
+        lines_out = [f"### {hdr}{q_text}".strip()]
+        for opt in (q.get("options") or []):
+            if isinstance(opt, dict):
+                desc = f" — {opt.get('description')}" if opt.get("description") else ""
+                lines_out.append(f"- **{opt.get('label', '')}**{desc}")
+        q_blocks.append("\n".join(lines_out))
+    formatted = "\n\n".join([*ctx_parts, *q_blocks]).strip()
+    blocked = {
+        "kind": "question",
+        "tool": "ask_user_question",
+        "message": first_q,
+        "formatted": formatted,
+    }
+
 has_tool_call = False
 reply_parts = []
 if last_assistant:
@@ -125,7 +174,8 @@ if last_assistant:
             reply_parts.append(item["text"])
 
 settled = (
-    last_assistant is not None
+    blocked is None
+    and last_assistant is not None
     and last_assistant_idx > last_wake_or_tool_idx
     and not has_tool_call
     and len(active_bg) == 0
@@ -136,6 +186,7 @@ print(json.dumps({
     "session_file": path,
     "total_lines": total,
     "settled": settled,
+    "blocked": blocked,
     "active_bg": sorted(active_bg),
     "reply": "\n\n".join(reply_parts).strip(),
     "usage": usage_totals,

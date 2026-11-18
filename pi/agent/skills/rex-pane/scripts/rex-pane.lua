@@ -21,7 +21,7 @@ local timeout_sec = tonumber(args.timeout_sec) or 3600
 local cmd = {
   "zsh",
   "-lc",
-  'export PI_PROGRAM_STATUS=1 REX_PANE_CHILD=1; cd -- "$1" && shift && exec pi "$@"',
+  'export PATH="$HOME/.local/bin:$HOME/.nvm/current/bin:/opt/homebrew/bin:$PATH" PI_PROGRAM_STATUS=1 REX_PANE_CHILD=1; command -v pi >/dev/null 2>&1 || for d in "$HOME"/.nvm/versions/node/*/bin; do [ -x "$d/pi" ] && PATH="$d:$PATH"; done; cd -- "$1" && shift && exec pi "$@"',
   "rex-pane",
   cwd,
 }
@@ -144,6 +144,55 @@ local function find_root_record(ps)
   return nil
 end
 
+local function check_blocked_session(retry_once)
+  local info = inspect_session()
+  if not (info and type(info.blocked) == "table") and retry_once then
+    rex.sleep(0.2)
+    info = inspect_session()
+  end
+  if info and type(info.blocked) == "table" then
+    local b = info.blocked
+    return finish(false, "blocked", {
+      message = b.message or "waiting on interactive input",
+      kind = b.kind or "question",
+      reply = (type(b.formatted) == "string" and b.formatted ~= "") and b.formatted or nil,
+      screen = capture_screen(),
+    })
+  end
+  return nil
+end
+
+local function check_child_exit()
+  local proc = rex.block.call("com.superlogical.terminal", "process", { block_id = bid })
+  if proc and proc.last_exit ~= nil then
+    local code = proc.last_exit.exit_code or 1
+    local info = inspect_session()
+    if code == 0 and info and info.settled then
+      return finish(true, "done", {
+        reply = info.reply or "",
+        session_file = info.session_file,
+        usage = info.usage,
+      })
+    end
+    return finish(false, "exited", {
+      exit_code = code,
+      message = string.format("pane process exited early with status %d", code),
+      reply = info and info.reply or nil,
+      screen = capture_screen(),
+    })
+  end
+  return nil
+end
+
+local function screen_looks_like_questionnaire(scr)
+  if type(scr) ~= "string" or not scr:find("Esc to cancel", 1, true) then
+    return false
+  end
+  return scr:find("Enter to select", 1, true) ~= nil
+    or scr:find("to expand", 1, true) ~= nil
+    or scr:find("Review your answers", 1, true) ~= nil
+end
+
 local function handle_root_record(rec)
   if not rec or not rec.state then
     return nil
@@ -202,18 +251,36 @@ while true do
   end
 
   local wait_slice = math.min(3, math.max(1, timeout_sec - elapsed))
-  local ev = rex.wait("terminal.program_status_changed", function(e, c)
-    return c.block_id == bid and (e.id == nil or e.id == "")
+  local ev = rex.wait("block_event", function(e, c)
+    if c.block_id ~= bid then
+      return false
+    end
+    if e.name == "program_status_changed" then
+      return e.id == nil or e.id == ""
+    end
+    return e.name == "bell" or e.name == "child_exited"
   end, wait_slice)
 
-  if ev and ev.record then
-    local res = handle_root_record(ev.record)
-    if res then
-      return res
+  if ev then
+    if ev.name == "program_status_changed" and ev.record then
+      local res = handle_root_record(ev.record)
+      if res then
+        return res
+      end
+    elseif ev.name == "bell" then
+      local res = check_blocked_session(true)
+      if res then
+        return res
+      end
+    elseif ev.name == "child_exited" then
+      local res = check_child_exit()
+      if res then
+        return res
+      end
     end
   else
     -- Poll current program_status and child process health in case a fast turn
-    -- settled before rex.wait subscribed or the shell/pi exited early.
+    -- settled before rex.wait subscribed or an extension dialog opened without OSC 7501.
     local ps = rex.block.call("com.superlogical.terminal", "program_status", { block_id = bid })
     local root_rec = find_root_record(ps)
     if root_rec then
@@ -221,25 +288,17 @@ while true do
       if res then
         return res
       end
+      if root_rec.state == "working" and screen_looks_like_questionnaire(capture_screen()) then
+        local q_res = check_blocked_session(false)
+        if q_res then
+          return q_res
+        end
+      end
     end
 
-    local proc = rex.block.call("com.superlogical.terminal", "process", { block_id = bid })
-    if proc and proc.last_exit ~= nil then
-      local code = proc.last_exit.exit_code or 1
-      local info = inspect_session()
-      if code == 0 and info and info.settled then
-        return finish(true, "done", {
-          reply = info.reply or "",
-          session_file = info.session_file,
-          usage = info.usage,
-        })
-      end
-      return finish(false, "exited", {
-        exit_code = code,
-        message = string.format("pane process exited early with status %d", code),
-        reply = info and info.reply or nil,
-        screen = capture_screen(),
-      })
+    local exit_res = check_child_exit()
+    if exit_res then
+      return exit_res
     end
   end
 end

@@ -28,9 +28,9 @@
 // Snapshot: discovered models persist per provider id in ~/.pi/agent/models-store.json
 // (pi's ModelsStore); filtering on restore is retained defensively, including old snapshots.
 // Startup restores the snapshot without network. Network refreshes happen when pi allows them
-// (interactive start, /model, `pi update --models`), at most every REFRESH_INTERVAL_MS unless
-// forced. When no snapshot exists yet, one bootstrap fetch (BOOTSTRAP_TIMEOUT_MS) runs even in
-// cache-only phases so `pi --list-models` works on first use; skipped with --offline/PI_OFFLINE.
+// (interactive start, /model), at most every REFRESH_INTERVAL_MS unless forced. When no snapshot
+// exists yet, one bootstrap fetch (BOOTSTRAP_TIMEOUT_MS) runs even in cache-only phases so
+// `pi --list-models` works on first use; skipped with --offline/PI_OFFLINE.
 // Any discovery failure leaves models.json models working (fail open).
 
 import { readFileSync } from "node:fs";
@@ -71,7 +71,7 @@ const PROVIDERS: ProviderConfig[] = [
 		name: "StepX AI GW",
 		root: "https://i-ai-gw.stepx.com",
 		emptyApiRule: "gpt-responses-otherwise-chat",
-		sessionAffinity: false,
+		sessionAffinity: true,
 	},
 	{
 		id: "stepcode",
@@ -113,9 +113,9 @@ const PREFERRED_CATALOGS: Record<ApiId, string[]> = {
 
 const SKIP_ID = /(^|[-_/.])(gpt-image|dall-e|tts|whisper|transcribe|embedding|embed|moderation|realtime|audio|rerank)|image/i;
 
-// Trailing `-segment`s that name a deployment rather than a model variant.
+// Trailing `-segment`s that name a deployment or region rather than a model variant.
 const DEPLOYMENT_SEGMENT =
-	/^(eval|platform|aipc|aliyun|aliyun2kimi|aliyun2zhipu|tencent2zhipu|tencent|silicon|mix|native|direct|kmood|aistudio|vertex|official|offical|aigc|product|codeplan|\d{4}|\d{8})$/i;
+	/^(eval|platform|aipc|aliyun|aliyun2kimi|aliyun2zhipu|tencent2zhipu|tencent|silicon|mix|native|direct|kmood|aistudio|vertex|official|offical|aigc|product|codeplan|eastus\d*|westus\d*|northcentralus|southcentralus|swedencentral|japaneast|\d{4}|\d{8})$/i;
 
 type GatewayModel = { id?: unknown; support_apis?: Array<{ id?: unknown }> };
 
@@ -166,20 +166,26 @@ function candidateKeys(id: string): string[] {
 		base = base.slice(slash + 1);
 		keys.push(base);
 	}
+	if (base.startsWith("stepcode-")) {
+		base = base.slice("stepcode-".length);
+		keys.push(base);
+	}
 	const parts = base.split("-");
 	while (parts.length > 1 && DEPLOYMENT_SEGMENT.test(parts[parts.length - 1])) {
 		parts.pop();
 		keys.push(parts.join("-"));
 	}
-	// Keep all existing matches ahead of version aliases. Bound version components to avoid
-	// treating date suffixes (e.g. -2025-11-01) as a major/minor version.
+	// Keep all existing matches ahead of version aliases and `-coding` base fallbacks.
 	const variants = keys.map((key) =>
 		key.replace(
 			/(^|[^\d.-]-)(\d{1,2})([-.])(\d{1,2})$/,
 			(_match, prefix, major, separator, minor) => `${prefix}${major}${separator === "-" ? "." : "-"}${minor}`,
 		),
 	);
-	return [...new Set([...keys, ...variants])];
+	const codingFallbacks = [...keys, ...variants]
+		.filter((key) => key.endsWith("-coding"))
+		.map((key) => key.slice(0, -"-coding".length));
+	return [...new Set([...keys, ...variants, ...codingFallbacks])];
 }
 
 function findCatalogEntry(id: string, api: ApiId): CatalogEntry | undefined {
@@ -331,8 +337,8 @@ function dispatch(config: ProviderConfig, model: any, run: (streams: any, model:
 }
 
 // On /reload pi re-registers providers and emits session_start before the async snapshot restore
-// publishes, so extensions that validate models at session_start (pi-memory's dream check) would
-// see an empty provider. Seed synchronously from the same snapshot; refreshModels still replaces it.
+// publishes, so extensions that validate models at session_start would see an empty provider.
+// Seed synchronously from the same snapshot; refreshModels still replaces it.
 function readSnapshot(providerId: string): any[] {
 	try {
 		const store = JSON.parse(readFileSync(join(getAgentDir(), "models-store.json"), "utf8"));

@@ -4,84 +4,31 @@
       "api": "anthropic-messages",
       "modelOverrides": {
         "claude-fable-5": {
-          "promptCache": {
-            "short": 300,
-            "long": 300
-          },
+          "promptCache": { "short": 300, "long": 300 },
           "compat": {
             "forceAdaptiveThinking": true,
-            "supportsLongCacheRetention": false,
-            "sendSessionAffinityHeaders": true,
-            "sessionAffinityFormat": "openrouter"
+            "supportsLongCacheRetention": false
           }
         },
         "claude-opus-5.5": {
-          "thinkingLevelMap": {
-            "off": "off",
-            "minimal": "low"
-          },
-          "promptCache": {
-            "short": 300,
-            "long": 3600
-          },
+          "thinkingLevelMap": { "off": "off", "minimal": "low" },
+          "promptCache": { "short": 300, "long": 3600 },
           "compat": {
             "forceAdaptiveThinking": true,
-            "supportsLongCacheRetention": true,
-            "sendSessionAffinityHeaders": true,
-            "sessionAffinityFormat": "openrouter"
+            "supportsLongCacheRetention": true
           }
         },
         "gpt-6-astra:caishi-azure": {
-          "compat": {
-            "sessionAffinityFormat": "openrouter"
-          },
-          "promptCache": {
-            "short": 300,
-            "long": 1800
-          }
+          "promptCache": { "short": 300, "long": 1800 }
         },
         "gpt-6-astra": {
-          "compat": {
-            "sessionAffinityFormat": "openrouter"
-          },
-          "promptCache": {
-            "short": 300,
-            "long": 1800
-          }
+          "promptCache": { "short": 300, "long": 1800 }
         },
         "gpt-6.1-sol-coding": {
-          "reasoning": true,
-          "thinkingLevelMap": {
-            "off": null,
-            "minimal": null,
-            "low": "low",
-            "medium": "medium",
-            "high": "high",
-            "xhigh": "xhigh",
-            "max": "max"
-          },
-          "input": [
-            "text",
-            "image"
-          ],
-          "contextWindow": 272000,
-          "maxTokens": 128000,
-          "compat": {
-            "sessionAffinityFormat": "openrouter"
-          },
-          "promptCache": {
-            "short": 300,
-            "long": 1800
-          }
+          "promptCache": { "short": 300, "long": 1800 }
         },
         "deepseek-v4.1-flash": {
-          "thinkingLevelMap": {
-            "off": "off",
-            "max": "max"
-          },
-          "compat": {
-            "sessionAffinityFormat": "openrouter"
-          }
+          "thinkingLevelMap": { "off": "off", "max": "max" }
         },
         "gemini-4-argon-xuelang-official": {
           "contextWindow": 1048576
@@ -91,87 +38,32 @@
     "gw": {
       "modelOverrides": {
         "claude-opus-5-5": {
-          "thinkingLevelMap": {
-            "off": "off",
-            "minimal": "low"
-          },
-          "promptCache": {
-            "short": 300,
-            "long": 3600
-          },
+          "thinkingLevelMap": { "off": "off", "minimal": "low" },
+          "promptCache": { "short": 300, "long": 3600 },
           "compat": {
             "forceAdaptiveThinking": true,
-            "supportsLongCacheRetention": true,
-            "sendSessionAffinityHeaders": true,
-            "sessionAffinityFormat": "openrouter"
+            "supportsLongCacheRetention": true
           }
         },
         "gpt-6.1-sol": {
-          "compat": {
-            "sessionAffinityFormat": "openrouter"
-          },
-          "promptCache": {
-            "short": 300,
-            "long": 1800
-          }
+          "promptCache": { "short": 300, "long": 1800 }
         },
         "gpt-6-astra": {
-          "compat": {
-            "sessionAffinityFormat": "openrouter"
-          },
-          "promptCache": {
-            "short": 300,
-            "long": 1800
-          }
+          "promptCache": { "short": 300, "long": 1800 }
         },
         "deepseek-v4.1-flash": {
-          "thinkingLevelMap": {
-            "off": "off",
-            "max": "max"
-          },
-          "compat": {
-            "thinkingFormat": "deepseek",
-            "sendSessionAffinityHeaders": true,
-            "sessionAffinityFormat": "openrouter"
-          }
+          "thinkingLevelMap": { "off": "off", "max": "max" },
+          "compat": { "thinkingFormat": "deepseek" }
         }
       }
     },
     "stepcode": {
       "modelOverrides": {
         "gpt-6-astra": {
-          "compat": {
-            "sessionAffinityFormat": "openrouter"
-          },
-          "promptCache": {
-            "short": 300,
-            "long": 1800
-          }
+          "promptCache": { "short": 300, "long": 1800 }
         },
         "stepcode-gpt-6.1-sol-eastus2": {
-          "reasoning": true,
-          "thinkingLevelMap": {
-            "off": null,
-            "minimal": null,
-            "low": "low",
-            "medium": "medium",
-            "high": "high",
-            "xhigh": "xhigh",
-            "max": "max"
-          },
-          "input": [
-            "text",
-            "image"
-          ],
-          "contextWindow": 272000,
-          "maxTokens": 128000,
-          "compat": {
-            "sessionAffinityFormat": "openrouter"
-          },
-          "promptCache": {
-            "short": 300,
-            "long": 1800
-          }
+          "promptCache": { "short": 300, "long": 1800 }
         }
       }
     }

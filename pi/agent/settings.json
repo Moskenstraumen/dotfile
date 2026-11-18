@@ -52,8 +52,7 @@
       "write": "syntaxVariable",
       "grep": "syntaxOperator",
       "find": "syntaxOperator",
-      "ls": "syntaxOperator",
-      "mcp": "customMessageLabel"
+      "ls": "syntaxOperator"
     }
   }
 }
